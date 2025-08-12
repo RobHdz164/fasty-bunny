@@ -57,8 +57,8 @@ public class categoriasController {
     }
 
     public static List<categoriaModel> obtenerTodas() {
-        List<categoriaModel> lista = new ArrayList<>();
-        String sql = "SELECT * FROM categoria";
+    List<categoriaModel> lista = new ArrayList<>();
+    String sql = "SELECT id_categoria, nombre_categoria FROM categoria";
         try (Connection con = conexionDB.obtenerConexion(); Statement st = con.createStatement(); ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 categoriaModel categoria = new categoriaModel(

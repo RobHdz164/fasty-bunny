@@ -83,4 +83,8 @@ public class usuarioModel {
     public void setIdRol(int idRol) {
         this.idRol = idRol;
     }
+@Override
+public String toString() {
+    return this.getNombre(); 
+}
 }

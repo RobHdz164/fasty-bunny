@@ -10,10 +10,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import mx.edu.utxicotepec.fastybunny.controller.productoController;
-import mx.edu.utxicotepec.fastybunny.controller.usuarioController;
 import mx.edu.utxicotepec.fastybunny.model.categoriaModel;
 import mx.edu.utxicotepec.fastybunny.model.productoModel;
-import mx.edu.utxicotepec.fastybunny.model.usuarioModel;
 
 
 /**
@@ -30,6 +28,7 @@ public class FrmProductos extends javax.swing.JInternalFrame {
         modeloTabla = new DefaultTableModel(new Object []{"id Producto","Nombre","Descripcion","Precio","Id Vendedor", "Id Categoria"},0);
         tblProductos = new JTable(modeloTabla);
         cargarProductos();
+        obtenerIdCategoria();
         initComponents();
     }
 
@@ -442,14 +441,7 @@ private void eliminarProducto() {
     }
 }
 
-private void cargarComboVendedores() {
-    List<String> nombres = usuarioController.obtenerNombresVendedores();
-    cboVendedor.removeAllItems(); // limpia el ComboBox
 
-    for (String nombre : nombres) {
-        cboVendedor.addItem(nombre);
-    }
-}
 
 private void obtenerIdCategoria() {
     cboCategoria.addActionListener(e -> {
@@ -479,7 +471,7 @@ private void limpiarCampos() {
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnModificar;
     private javax.swing.JComboBox<categoriaModel> cboCategoria;
-    private javax.swing.JComboBox<String> cboVendedor;
+    private javax.swing.JComboBox<usuarioModel> cboVendedor;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;

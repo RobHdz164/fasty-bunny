@@ -19,5 +19,4 @@
         </dependency>  
     </dependencies>
     <name>FastyBunny</name>
-    mvn clean compile
 </project>

@@ -11,8 +11,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
 import mx.edu.utxicotepec.fastybunny.conexion.conexionDB;
+import mx.edu.utxicotepec.fastybunny.model.categoriaModel;
 import mx.edu.utxicotepec.fastybunny.model.productoModel;
+import mx.edu.utxicotepec.fastybunny.model.usuarioModel;
 
 /**
  *
@@ -85,5 +88,41 @@ public class productoController {
         return lista;
     }
     
+ public static List<usuarioModel> obtenerVendedores() {
+        List<usuarioModel> vendedores = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios WHERE id_rol=2";
+         try (Connection con = conexionDB.obtenerConexion(); Statement st = con.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                usuarioModel usuario = new usuarioModel(
+                    rs.getInt("id_usuario"),
+                    rs.getString("nombre"),
+                    rs.getString("correo"),
+                    rs.getString("contraseña"),
+                    rs.getString("telefono"),
+                    rs.getInt("id_rol")
+                );
+                vendedores.add(usuario);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vendedores;
+    }
 
+    public static List<categoriaModel> obtenerCategorias() {
+        List<categoriaModel> categorias = new ArrayList<>();
+        String sql = "SELECT * FROM categorias";
+         try (Connection con = conexionDB.obtenerConexion(); Statement st = con.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                categoriaModel c = new categoriaModel(
+                    rs.getInt("id_categoria"),
+                    rs.getString("nombre")
+                );
+                categorias.add(c);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return categorias;
+    }
 }

@@ -4,7 +4,6 @@
  */
 package mx.edu.utxicotepec.fastybunny.view;
 
-import java.math.BigDecimal;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -12,6 +11,7 @@ import javax.swing.table.DefaultTableModel;
 import mx.edu.utxicotepec.fastybunny.controller.productoController;
 import mx.edu.utxicotepec.fastybunny.model.categoriaModel;
 import mx.edu.utxicotepec.fastybunny.model.productoModel;
+import mx.edu.utxicotepec.fastybunny.model.usuarioModel;
 
 
 /**
@@ -24,13 +24,14 @@ public class FrmProductos extends javax.swing.JInternalFrame {
      * Creates new form FrmRegistrarS
      */
     public FrmProductos() {
-        super("Productos",true,false,false,true);
-        modeloTabla = new DefaultTableModel(new Object []{"id Producto","Nombre","Descripcion","Precio","Id Vendedor", "Id Categoria"},0);
-        tblProductos = new JTable(modeloTabla);
-        cargarProductos();
-        obtenerIdCategoria();
-        initComponents();
-    }
+    super("Productos",true,false,false,true);
+    modeloTabla = new DefaultTableModel(new Object []{"id Producto","Nombre","Descripcion","Precio","Id Vendedor", "Id Categoria"},0);
+    tblProductos = new JTable(modeloTabla);
+    initComponents();         // <-- PRIMERO inicializa los componentes
+    cargarProductos();
+    cargarVendedores();
+    cargarCategorias();
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -441,15 +442,20 @@ private void eliminarProducto() {
     }
 }
 
+private void cargarVendedores() {
+    cboVendedor.removeAllItems();
+    List<usuarioModel> vendedores = productoController.obtenerVendedores();
+    for (usuarioModel vendedor : vendedores) {
+        cboVendedor.addItem(vendedor);
+    }
+}
 
-
-private void obtenerIdCategoria() {
-    cboCategoria.addActionListener(e -> {
-        categoriaModel seleccionada = (categoriaModel) cboCategoria.getSelectedItem();
-        if (seleccionada != null) {
-            idCategoriaObtenida = seleccionada.getIdCategoria();
-        }
-    });
+private void cargarCategorias() {
+    cboCategoria.removeAllItems();
+    List<categoriaModel> categorias = productoController.obtenerCategorias();
+    for (categoriaModel categoria : categorias) {
+        cboCategoria.addItem(categoria);
+    }
 }
 
 private void limpiarCampos() {

@@ -109,12 +109,7 @@ public class usuarioController {
         }
     }
 
-    /**
-     * Verifica si las credenciales son válidas y si el usuario tiene el rol de Administrador (id_rol = 1).
-     * @param correo    Correo ingresado.
-     * @param contraseña Contraseña ingresada.
-     * @return true si las credenciales son válidas y el rol es Administrador.
-     */
+   
     public static boolean verificarCredenciales(String correo, String contraseña) {
         String sql = "SELECT * FROM usuario WHERE correo = ? AND contraseña = ? AND id_rol = 1";
         try (Connection con = conexionDB.obtenerConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -128,22 +123,27 @@ public class usuarioController {
             return false;
         }
     }
-    public static List<String> obtenerNombresVendedores() {
-    List<String> vendedores = new ArrayList<>();
-    String sql = "SELECT nombre FROM usuario WHERE id_rol = 2";
 
-    try (Connection con = conexionDB.obtenerConexion();
-         PreparedStatement ps = con.prepareStatement(sql);
+    public static List<usuarioModel> obtenerVendedores() {
+    List<usuarioModel> lista = new ArrayList<>();
+    String sql = "SELECT * FROM usuario WHERE id_rol = 2";
+    try (Connection con = conexionDB.obtenerConexion(); 
+         PreparedStatement ps = con.prepareStatement(sql); 
          ResultSet rs = ps.executeQuery()) {
-
         while (rs.next()) {
-            vendedores.add(rs.getString("nombre"));
+            usuarioModel usuario = new usuarioModel(
+                rs.getInt("id_usuario"),
+                rs.getString("nombre"),
+                rs.getString("correo"),
+                rs.getString("contraseña"),
+                rs.getString("telefono"),
+                rs.getInt("id_rol")
+            );
+            lista.add(usuario);
         }
-
-    } catch (SQLException e) {
-        e.printStackTrace();
+    } catch (SQLException ex) {
+        ex.printStackTrace();
     }
-
-    return vendedores;
-}
+    return lista;
+    }
 }

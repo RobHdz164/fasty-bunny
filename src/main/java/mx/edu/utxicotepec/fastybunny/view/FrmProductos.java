@@ -5,10 +5,14 @@
 package mx.edu.utxicotepec.fastybunny.view;
 
 import java.util.List;
+
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
 import mx.edu.utxicotepec.fastybunny.controller.productoController;
+import mx.edu.utxicotepec.fastybunny.controller.categoriasController;
+import mx.edu.utxicotepec.fastybunny.controller.usuarioController;
 import mx.edu.utxicotepec.fastybunny.model.categoriaModel;
 import mx.edu.utxicotepec.fastybunny.model.productoModel;
 import mx.edu.utxicotepec.fastybunny.model.usuarioModel;
@@ -27,10 +31,12 @@ public class FrmProductos extends javax.swing.JInternalFrame {
     super("Productos",true,false,false,true);
     modeloTabla = new DefaultTableModel(new Object []{"id Producto","Nombre","Descripcion","Precio","Id Vendedor", "Id Categoria"},0);
     tblProductos = new JTable(modeloTabla);
-    initComponents();         // <-- PRIMERO inicializa los componentes
+    initComponents();
     cargarProductos();
-    cargarVendedores();
-    cargarCategorias();
+    obtenerVendedores();
+    obtenerIdVendedor();
+    obtenerCategorias();
+    obtenerIdCategoria();
 }
 
     /**
@@ -442,20 +448,38 @@ private void eliminarProducto() {
     }
 }
 
-private void cargarVendedores() {
+private void obtenerVendedores() {
     cboVendedor.removeAllItems();
-    List<usuarioModel> vendedores = productoController.obtenerVendedores();
+    List<usuarioModel> vendedores = usuarioController.obtenerVendedores();
     for (usuarioModel vendedor : vendedores) {
         cboVendedor.addItem(vendedor);
     }
 }
 
-private void cargarCategorias() {
+private void obtenerIdVendedor() {
+    cboVendedor.addActionListener(e -> {
+        usuarioModel seleccionado = (usuarioModel) cboVendedor.getSelectedItem();
+        if (seleccionado != null) {
+            idVendedorObtenido = seleccionado.getIdUsuario();
+        }
+    });
+}
+
+private void obtenerCategorias() {
     cboCategoria.removeAllItems();
-    List<categoriaModel> categorias = productoController.obtenerCategorias();
+    List<categoriaModel> categorias = categoriasController.obtenerTodas();
     for (categoriaModel categoria : categorias) {
         cboCategoria.addItem(categoria);
     }
+}
+
+private void obtenerIdCategoria() {
+    cboCategoria.addActionListener(e -> {
+        categoriaModel seleccionada = (categoriaModel) cboCategoria.getSelectedItem();
+        if (seleccionada != null) {
+            idCategoriaObtenida = seleccionada.getIdCategoria();
+        }
+    });
 }
 
 private void limpiarCampos() {

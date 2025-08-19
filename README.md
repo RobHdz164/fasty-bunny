@@ -55,7 +55,7 @@ La aplicación está orientada a administradores, por lo que no es necesario pre
 
 ## Autores
 
-Roberto Hernandez Cruz
-Andrey Ortega Garcia
-Monica Itzel Romero Calva
-Paola Michelle Angely Rodríguez Hernández
+- Roberto Hernandez Cruz.
+- Andrey Ortega Garcia.
+- Monica Itzel Romero Calva.
+- Paola Michelle Angely Rodríguez Hernández.

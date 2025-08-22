@@ -6,7 +6,6 @@ package mx.edu.utxicotepec.fastybunny.view;
 
 import java.util.List;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -20,19 +19,20 @@ import mx.edu.utxicotepec.fastybunny.model.categoriaModel;
  */
 public class FrmCategorias extends javax.swing.JInternalFrame {
     private DefaultTableModel modeloTabla;
+    private int idCategoria = 0;
 
     /**
      * Constructor del formulario FrmCategorias.
      */
     public FrmCategorias() {
         // Título de la ventana y propiedades del JInternalFrame.
-        super("Categorías", true, false, false, true);
-        // Se inicializa el modelo de la tabla con las columnas correctas.
-        modeloTabla = new DefaultTableModel(new Object[]{"Id Categoria", "Nombre"}, 0);
+        super("Categorías", true, true, false, true);
         
         // Se inicializan los componentes gráficos generados por el diseñador.
         initComponents();
         
+        // Se inicializa el modelo de la tabla con las columnas correctas.
+        modeloTabla = new DefaultTableModel(new Object[]{"Id Categoria", "Nombre"}, 0);
         // Se asigna el modelo a la tabla (debe hacerse después de initComponents).
         tblCategorias.setModel(modeloTabla);
         
@@ -41,6 +41,9 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
         
         // Se configura el listener para la selección de filas en la tabla.
         configurarListenerTabla();
+        
+        // Habilitar botones
+        actualizarEstadoBotones(false);
     }
     
     /**
@@ -54,8 +57,11 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
                 // Se evita la doble notificación del evento.
                 if (!event.getValueIsAdjusting() && tblCategorias.getSelectedRow() != -1) {
                     int filaSeleccionada = tblCategorias.getSelectedRow();
-                    // Se obtiene el nombre de la categoría de la columna 1 y se muestra en el campo de texto.
+                    // Se obtiene el ID y el nombre de la categoría
+                    idCategoria = (int) tblCategorias.getValueAt(filaSeleccionada, 0);
                     txtNombre.setText(tblCategorias.getValueAt(filaSeleccionada, 1).toString());
+                    // Se actualiza el estado de los botones
+                    actualizarEstadoBotones(true);
                 }
             }
         });
@@ -81,6 +87,18 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
     private void limpiarCampos() {
         txtNombre.setText("");
         tblCategorias.clearSelection();
+        idCategoria = 0;
+        actualizarEstadoBotones(false);
+    }
+    
+    /**
+     * Habilita o deshabilita los botones de acción según el estado.
+     * @param seleccion Fila seleccionada
+     */
+    private void actualizarEstadoBotones(boolean seleccion) {
+        btnGuardar.setEnabled(!seleccion);
+        btnModificar.setEnabled(seleccion);
+        btnEliminar.setEnabled(seleccion);
     }
 
     /**
@@ -99,22 +117,24 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
         tblCategorias = new javax.swing.JTable();
         lblNombreRol = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        btnAgregar3 = new javax.swing.JButton();
+        btnNuevo = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
-        btnBuscar = new javax.swing.JButton();
         btnModificar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
 
         setClosable(true);
+        setTitle("Gestión de Categorías");
 
         jPanel1.setBackground(new java.awt.Color(91, 171, 185));
 
         lblUsuario.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 18)); // NOI18N
-        lblUsuario.setText("Categorias de Producto");
+        lblUsuario.setForeground(new java.awt.Color(255, 255, 255));
+        lblUsuario.setText("Gestión de Categorías");
 
+        txtNombre.setBackground(new java.awt.Color(224, 247, 250));
         txtNombre.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
 
-        tblCategorias.setBackground(new java.awt.Color(204, 255, 204));
+        tblCategorias.setBackground(new java.awt.Color(224, 247, 250));
         tblCategorias.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -126,49 +146,58 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
         jScrollPane1.setViewportView(tblCategorias);
 
         lblNombreRol.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        lblNombreRol.setText("Nombre de Categoria:");
+        lblNombreRol.setForeground(new java.awt.Color(255, 255, 255));
+        lblNombreRol.setText("Nombre de Categoría:");
 
-        jPanel5.setBackground(new java.awt.Color(153, 153, 255));
+        jPanel5.setBackground(new java.awt.Color(77, 148, 158));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Acciones", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(255, 255, 255))); // NOI18N
 
-        btnAgregar3.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        btnAgregar3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Agregar.png"))); // NOI18N
-        btnAgregar3.setText("Nuevo");
-        btnAgregar3.addActionListener(new java.awt.event.ActionListener() {
+        btnNuevo.setBackground(new java.awt.Color(0, 102, 102));
+        btnNuevo.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        btnNuevo.setForeground(new java.awt.Color(255, 255, 255));
+        btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Agregar.png"))); // NOI18N
+        btnNuevo.setText("Nuevo");
+        btnNuevo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnNuevo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAgregar3ActionPerformed(evt);
+                btnNuevoActionPerformed(evt);
             }
         });
 
+        btnGuardar.setBackground(new java.awt.Color(0, 102, 102));
         btnGuardar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Icono2.png"))); // NOI18N
+        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
+        btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/aceptar.png"))); // NOI18N
         btnGuardar.setText("Guardar");
+        btnGuardar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnGuardar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGuardarActionPerformed(evt);
             }
         });
 
-        btnBuscar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Icono1.png"))); // NOI18N
-        btnBuscar.setText("Buscar");
-        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuscarActionPerformed(evt);
-            }
-        });
-
+        btnModificar.setBackground(new java.awt.Color(0, 102, 102));
         btnModificar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        btnModificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Icono3.png"))); // NOI18N
+        btnModificar.setForeground(new java.awt.Color(255, 255, 255));
+        btnModificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Icono2.png"))); // NOI18N
         btnModificar.setText("Modificar");
+        btnModificar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnModificar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnModificar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnModificarActionPerformed(evt);
             }
         });
 
+        btnEliminar.setBackground(new java.awt.Color(0, 102, 102));
         btnEliminar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Imagen3.png"))); // NOI18N
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Eliminar.png"))); // NOI18N
         btnEliminar.setText("Eliminar");
+        btnEliminar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEliminarActionPerformed(evt);
@@ -181,28 +210,25 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnAgregar3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnEliminar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addComponent(btnModificar)
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addComponent(btnNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnModificar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnAgregar3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnEliminar)
-                    .addComponent(btnBuscar)
-                    .addComponent(btnModificar))
-                .addContainerGap())
+                    .addComponent(btnNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnModificar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -210,24 +236,20 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(30, 30, 30)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(66, 66, 66)
-                                .addComponent(lblUsuario))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(46, 46, 46)
-                                .addComponent(lblNombreRol)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addComponent(lblNombreRol)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblUsuario))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 20, Short.MAX_VALUE)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(14, 14, 14))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -238,7 +260,7 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblNombreRol))
-                .addGap(61, 61, 61)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
@@ -259,23 +281,12 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * Acción del botón "Nuevo".
-     * Limpia los campos del formulario para una nueva entrada.
-     * @param evt Evento de acción.
-     */
-    private void btnAgregar3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregar3ActionPerformed
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
         limpiarCampos();
-    }//GEN-LAST:event_btnAgregar3ActionPerformed
+    }//GEN-LAST:event_btnNuevoActionPerformed
 
-    /**
-     * Acción del botón "Guardar".
-     * Inserta una nueva categoría con el nombre proporcionado en el campo de texto.
-     * @param evt Evento de acción.
-     */
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         String nombre = txtNombre.getText();
-        // Validación para asegurar que el nombre no esté vacío.
         if (nombre.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "El nombre de la categoría no puede estar vacío.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
             return;
@@ -284,84 +295,48 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
         categoriaModel categoria = new categoriaModel(nombre);
         if (categoriasController.insertarCategoria(categoria)) {
             JOptionPane.showMessageDialog(this, "Categoría guardada exitosamente.");
-            cargarCategorias(); // Recarga la tabla para mostrar la nueva categoría.
-            limpiarCampos();   // Limpia el formulario.
+            cargarCategorias();
+            limpiarCampos();
         } else {
             JOptionPane.showMessageDialog(this, "Error al guardar la categoría.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
-    /**
-     * Acción del botón "Buscar".
-     * (Funcionalidad pendiente de implementación en el controlador).
-     * @param evt Evento de acción.
-     */
-    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // Lógica de búsqueda (requiere un método en el controlador, por ejemplo, buscarPorNombre).
-        String busqueda = JOptionPane.showInputDialog(this, "Ingrese el nombre de la categoría a buscar:");
-        if (busqueda != null && !busqueda.trim().isEmpty()) {
-            // Aquí iría la llamada al método del controlador y la actualización de la tabla.
-            // Ejemplo: List<categoriaModel> resultados = categoriasController.buscarPorNombre(busqueda);
-            // y luego actualizar la tabla con los resultados.
-            JOptionPane.showMessageDialog(this, "Funcionalidad de búsqueda no implementada aún.");
-        }
-    }//GEN-LAST:event_btnBuscarActionPerformed
-
-    /**
-     * Acción del botón "Modificar".
-     * Actualiza el nombre de la categoría seleccionada.
-     * @param evt Evento de acción.
-     */
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-        int filaSeleccionada = tblCategorias.getSelectedRow();
-        
-        // Verifica si se ha seleccionado una fila.
-        if (filaSeleccionada == -1) {
+        if (idCategoria == 0) {
             JOptionPane.showMessageDialog(this, "Por favor, seleccione una categoría para modificar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
         String nombre = txtNombre.getText();
-        // Validación para asegurar que el nuevo nombre no esté vacío.
         if (nombre.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "El nombre de la categoría no puede estar vacío.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        int idCategoria = (int) tblCategorias.getValueAt(filaSeleccionada, 0);
         categoriaModel categoria = new categoriaModel(idCategoria, nombre);
         
         if (categoriasController.actualizarCategoria(categoria)) {
             JOptionPane.showMessageDialog(this, "Categoría modificada exitosamente.");
-            cargarCategorias(); // Recarga la tabla.
-            limpiarCampos();   // Limpia el formulario.
+            cargarCategorias();
+            limpiarCampos();
         } else {
             JOptionPane.showMessageDialog(this, "Error al modificar la categoría.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnModificarActionPerformed
 
-    /**
-     * Acción del botón "Eliminar".
-     * Elimina la categoría seleccionada en la tabla.
-     * @param evt Evento de acción.
-     */
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        int filaSeleccionada = tblCategorias.getSelectedRow();
-        
-        // Verifica si se ha seleccionado una fila.
-        if (filaSeleccionada == -1) {
+        if (idCategoria == 0) {
             JOptionPane.showMessageDialog(this, "Por favor, seleccione una categoría para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        // Pide confirmación al usuario antes de eliminar.
         int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar esta categoría?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
-            int idCategoria = (int) tblCategorias.getValueAt(filaSeleccionada, 0);
             if (categoriasController.eliminarCategoria(idCategoria)) {
                 JOptionPane.showMessageDialog(this, "Categoría eliminada exitosamente.");
-                cargarCategorias(); // Recarga la tabla.
-                limpiarCampos();   // Limpia el formulario.
+                cargarCategorias();
+                limpiarCampos();
             } else {
                 JOptionPane.showMessageDialog(this, "Error al eliminar la categoría.", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -370,11 +345,10 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAgregar3;
-    private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnModificar;
+    private javax.swing.JButton btnNuevo;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;

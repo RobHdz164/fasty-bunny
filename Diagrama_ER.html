@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama Entidad-Relación - Fasty Bunny</title>
+    <style>
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #006666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Diagrama Entidad-Relación: Fasty Bunny</h1>
+        <pre class="mermaid">
+            erDiagram
+                usuarios {
+                    int id_usuario PK "ID de Usuario"
+                    varchar nombre "Nombre"
+                    varchar telefono "Teléfono"
+                    varchar correo "Correo Electrónico"
+                    varchar password "Contraseña (hash)"
+                    int id_rol FK "ID de Rol"
+                }
+                roles {
+                    int id_rol PK "ID de Rol"
+                    varchar nombre_rol "Nombre del Rol"
+                }
+                productos {
+                    int id_producto PK "ID de Producto"
+                    varchar nombre_producto "Nombre del Producto"
+                    varchar descripcion "Descripción"
+                    decimal precio "Precio"
+                    int id_vendedor FK "ID del Vendedor (Usuario)"
+                    int id_categoria FK "ID de Categoría"
+                }
+                categorias {
+                    int id_categoria PK "ID de Categoría"
+                    varchar nombre_categoria "Nombre de la Categoría"
+                }
+
+                usuarios }o--|| roles : "tiene un"
+                productos }o--|| usuarios : "es vendido por"
+                productos }o--|| categorias : "pertenece a"
+        </pre>
+        <p>Este diagrama muestra la estructura de la base de datos de la aplicación Fasty Bunny.</p>
+    </div>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>

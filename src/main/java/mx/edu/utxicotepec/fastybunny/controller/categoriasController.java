@@ -12,7 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import mx.edu.utxicotepec.fastybunny.conexion.conexionDB;
+import mx.edu.utxicotepec.fastybunny.database.conexionDB;
 import mx.edu.utxicotepec.fastybunny.model.categoriaModel;
 
 /**

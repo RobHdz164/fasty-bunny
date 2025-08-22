@@ -14,7 +14,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import mx.edu.utxicotepec.fastybunny.conexion.conexionDB;
+import mx.edu.utxicotepec.fastybunny.database.conexionDB;
 import mx.edu.utxicotepec.fastybunny.model.usuarioModel;
 
 /**

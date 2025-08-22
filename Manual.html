@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - Fasty Bunny</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #5babb9; /* Base color from app */
+            --secondary-color: #006666; /* Button color from app */
+            --accent-color: #77c9d4;
+            --background-color: #f8f9fa;
+            --text-color: #343a40;
+            --light-text-color: #ffffff;
+            --card-bg-color: #ffffff;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--light-text-color);
+            text-align: center;
+            padding: 50px 20px;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.8em;
+            font-weight: 700;
+        }
+
+        header p {
+            margin: 10px 0 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .seccion {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .seccion:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(91, 171, 185, 0.2);
+        }
+
+        h2 {
+            font-size: 2em;
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2 i {
+            margin-right: 15px;
+            font-size: 0.9em;
+        }
+
+        h3 {
+            font-size: 1.4em;
+            color: var(--primary-color);
+            margin-top: 30px;
+        }
+
+        p, li {
+            font-size: 16px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        ul li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 8px;
+        }
+
+        ul li::before {
+            content: '\f138'; /* FontAwesome check-circle icon */
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--primary-color);
+        }
+        
+        .pasos {
+            list-style-type: none;
+            counter-reset: paso-counter;
+            padding-left: 0;
+        }
+
+        .pasos li {
+            counter-increment: paso-counter;
+            margin-bottom: 15px;
+            padding-left: 45px;
+            position: relative;
+        }
+
+        .pasos li::before {
+            content: counter(paso-counter);
+            position: absolute;
+            left: 0;
+            top: -2px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .nota {
+            background-color: #e3f2fd;
+            border-left: 6px solid var(--primary-color);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .nota strong {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .button-desc {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #495057;
+            box-shadow: 0 2px 0 #ced4da;
+            display: inline-block;
+            margin: 0 2px;
+            position: relative;
+            top: -1px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px 20px;
+            background-color: var(--card-bg-color);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.95em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Manual de Usuario Fasty Bunny</h1>
+            <p>Una guía completa para el uso y gestión del sistema.</p>
+        </header>
+
+        <div class="seccion" id="introduccion">
+            <h2><i class="fas fa-rocket"></i> 1. Introducción</h2>
+            <p>Bienvenido al manual de usuario de Fasty Bunny. Este documento proporciona una guía detallada sobre cómo utilizar las diferentes funcionalidades del sistema, desde el inicio de sesión hasta la gestión de productos, usuarios, roles y categorías. El sistema ha sido diseñado para ser intuitivo y eficiente.</p>
+        </div>
+
+        <div class="seccion" id="login">
+            <h2><i class="fas fa-sign-in-alt"></i> 2. Inicio de Sesión</h2>
+            <p>La ventana de inicio de sesión es la puerta de entrada al sistema. Para acceder, debe contar con credenciales válidas (correo y contraseña).</p>
+            <h3>Pasos para ingresar:</h3>
+            <ol class="pasos">
+                <li>Abra la aplicación para visualizar la ventana de "Login".</li>
+                <li>Ingrese su <strong>Correo Electrónico</strong> en el campo correspondiente.</li>
+                <li>Ingrese su <strong>Contraseña</strong> en el campo correspondiente.</li>
+                <li>Haga clic en el botón <span class="button-desc">Ingresar</span>.</li>
+                <li>Si las credenciales son correctas, se abrirá el Menú Principal. De lo contrario, recibirá un mensaje de error.</li>
+                <li>Para cerrar la aplicación desde esta ventana, haga clic en <span class="button-desc">Salir</span>.</li>
+            </ol>
+        </div>
+
+        <div class="seccion" id="menu">
+            <h2><i class="fas fa-compass"></i> 3. Menú Principal</h2>
+            <p>Una vez que ha iniciado sesión, accederá al Menú Principal, que actúa como el centro de navegación para todas las funciones de gestión del sistema.</p>
+            <h3>Navegación:</h3>
+            <ul>
+                <li><strong>Archivo:</strong> Contiene la opción <span class="button-desc">Salir</span> para cerrar la aplicación de forma segura.</li>
+                <li><strong>Mantenimiento:</strong> Despliega los módulos de gestión disponibles:
+                    <ul>
+                        <li>Usuarios</li>
+                        <li>Roles</li>
+                        <li>Categorías</li>
+                        <li>Productos</li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="nota">
+                <strong>Nota:</strong> El sistema está diseñado para prevenir la duplicación de ventanas. Solo se puede abrir una instancia de cada formulario de gestión a la vez.
+            </div>
+        </div>
+
+        <div class="seccion" id="gestion">
+            <h2><i class="fas fa-cogs"></i> 4. Módulos de Gestión (CRUD)</h2>
+            <p>Todos los módulos de gestión (Roles, Categorías, Usuarios y Productos) siguen una estructura similar y una lógica de botones consistente para facilitar su uso.</p>
+
+            <h3>4.1. Gestión de Roles y Categorías</h3>
+            <p>Estos formularios permiten administrar los roles de usuario y las categorías de productos. Ambos funcionan de manera idéntica.</p>
+            <ol class="pasos">
+                <li><strong>Ver Roles/Categorías:</strong> La tabla principal muestra todos los registros existentes.</li>
+                <li><strong>Crear un nuevo registro:</strong>
+                    <ul>
+                        <li>Haga clic en <span class="button-desc">Nuevo</span>. Esto limpiará el campo de texto y habilitará el botón Guardar.</li>
+                        <li>Escriba el nombre en el campo "Nombre del Rol" o "Nombre de la Categoría".</li>
+                        <li>Haga clic en <span class="button-desc">Guardar</span>.</li>
+                    </ul>
+                </li>
+                <li><strong>Modificar un registro:</strong>
+                    <ul>
+                        <li>Seleccione un registro de la tabla. Los datos se cargarán automáticamente en el formulario.</li>
+                        <li>Modifique el nombre como desee.</li>
+                        <li>Haga clic en <span class="button-desc">Modificar</span> para aplicar los cambios.</li>
+                    </ul>
+                </li>
+                <li><strong>Eliminar un registro:</strong>
+                    <ul>
+                        <li>Seleccione el registro que desea eliminar de la tabla.</li>
+                        <li>Haga clic en el botón <span class="button-desc">Eliminar</span>.</li>
+                        <li>Confirme la eliminación en el cuadro de diálogo que aparecerá.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>4.2. Gestión de Usuarios</h3>
+            <p>Este módulo permite administrar las cuentas de usuario que pueden acceder al sistema.</p>
+            <ol class="pasos">
+                <li><strong>Crear un nuevo usuario:</strong>
+                    <ul>
+                        <li>Haga clic en <span class="button-desc">Nuevo</span>. Se limpiarán los campos y se habilitará el botón "Guardar".</li>
+                        <li>Rellene todos los campos: Nombre, Teléfono, Correo, Contraseña y seleccione un Rol de la lista desplegable.</li>
+                        <li>Haga clic en <span class="button-desc">Guardar</span>.</li>
+                    </ul>
+                </li>
+                <li><strong>Buscar un usuario:</strong>
+                    <ul>
+                        <li>Escriba el nombre (o parte del nombre) del usuario en el campo de texto de <strong>Buscar</strong>.</li>
+                        <li>La tabla se filtrará automáticamente para mostrar los resultados.</li>
+                        <li>Para volver a ver todos los usuarios, simplemente borre el texto del campo de búsqueda.</li>
+                    </ul>
+                </li>
+                <li><strong>Modificar un usuario:</strong>
+                    <ul>
+                        <li>Seleccione un usuario de la tabla. Sus datos se cargarán en el formulario y se habilitarán los botones "Modificar" y "Eliminar".</li>
+                        <li>Realice los cambios necesarios. Si no desea cambiar la contraseña, puede dejar el campo en blanco.</li>
+                        <li>Haga clic en <span class="button-desc">Modificar</span>.</li>
+                    </ul>
+                </li>
+                <li><strong>Eliminar un usuario:</strong>
+                    <ul>
+                        <li>Seleccione el usuario a eliminar de la tabla.</li>
+                        <li>Haga clic en <span class="button-desc">Eliminar</span> y confirme la acción.</li>
+                    </ul>
+                </li>
+            </ol>
+            <div class="nota">
+                <strong>Seguridad:</strong> Por razones de seguridad, la contraseña de los usuarios no se muestra en la tabla ni se carga en el formulario al seleccionar un usuario.
+            </div>
+
+            <h3>4.3. Gestión de Productos</h3>
+            <p>Este módulo permite administrar el inventario de productos.</p>
+            <ol class="pasos">
+                <li><strong>Crear un nuevo producto:</strong>
+                    <ul>
+                        <li>Haga clic en <span class="button-desc">Nuevo</span>. Se limpiarán los campos y se habilitará el botón "Guardar".</li>
+                        <li>Rellene todos los campos: Nombre, Descripción, Precio y seleccione un Vendedor y una Categoría de las listas desplegables.</li>
+                        <li>Haga clic en <span class="button-desc">Guardar</span>.</li>
+                    </ul>
+                </li>
+                <li><strong>Buscar un producto:</strong>
+                    <ul>
+                        <li>Escriba el nombre del producto en el campo de <strong>Buscar</strong>.</li>
+                        <li>La tabla se filtrará automáticamente para mostrar los resultados.</li>
+                    </ul>
+                </li>
+                <li><strong>Modificar un producto:</strong>
+                    <ul>
+                        <li>Seleccione un producto de la tabla. Sus datos se cargarán en el formulario y se habilitarán los botones "Modificar" y "Eliminar".</li>
+                        <li>Realice los cambios que necesite.</li>
+                        <li>Haga clic en <span class="button-desc">Modificar</span>.</li>
+                    </ul>
+                </li>
+                <li><strong>Eliminar un producto:</strong>
+                    <ul>
+                        <li>Seleccione el producto a eliminar de la tabla.</li>
+                        <li>Haga clic en <span class="button-desc">Eliminar</span> y confirme la acción.</li>
+                    </ul>
+                </li>
+            </ol>
+             <div class="nota">
+                <strong>Nota:</strong> La tabla de productos muestra los nombres del vendedor y la categoría en lugar de sus IDs para una mayor claridad.
+            </div>
+        </div>
+
+        <footer>
+            <p>Manual de Usuario Fasty Bunny - Generado el 22 de agosto de 2025</p>
+        </footer>
+    </div>
+</body>
+</html>

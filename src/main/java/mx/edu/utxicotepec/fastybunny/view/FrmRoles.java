@@ -7,24 +7,43 @@ package mx.edu.utxicotepec.fastybunny.view;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import mx.edu.utxicotepec.fastybunny.controller.rolController;
 import mx.edu.utxicotepec.fastybunny.model.rolModel;
 
 /**
- *
+ * Formulario para la gestión de Roles de Usuario (CRUD).
+ * Permite agregar, modificar, eliminar y consultar los roles del sistema.
  * @author PC-05
  */
 public class FrmRoles extends javax.swing.JInternalFrame {
     private DefaultTableModel modeloTabla;
+    private int idRolSeleccionado = 0; // Almacena el ID del rol seleccionado en la tabla
 
-   
+    /**
+     * Constructor del formulario FrmRoles.
+     * Inicializa los componentes, configura la tabla y carga los datos iniciales.
+     */
     public FrmRoles() {
-        super("Roles de Usuario",true,false,false,true);
-        modeloTabla = new DefaultTableModel(new Object[]{"Id Rol","Nombre"},0);
-        tblRol=new JTable(modeloTabla);
-        cargarRoles();
+        super("Roles de Usuario", true, false, false, true);
+        
+        // CORRECCIÓN CRÍTICA: Llamar a initComponents() ANTES de cualquier manipulación de componentes.
         initComponents();
+        
+        // Inicializa el modelo de la tabla y lo asigna al JTable.
+        modeloTabla = new DefaultTableModel(new Object[]{"ID Rol", "Nombre del Rol"}, 0);
+        tblRol.setModel(modeloTabla);
+        
+        // Carga los roles desde la base de datos.
+        cargarRoles();
+        
+        // Configura el listener para la selección de filas en la tabla.
+        configurarListenerTabla();
+        
+        // Asegura que los botones de modificar y eliminar estén desactivados al inicio.
+        actualizarEstadoBotones(false);
     }
 
     /**
@@ -43,9 +62,9 @@ public class FrmRoles extends javax.swing.JInternalFrame {
         tblRol = new javax.swing.JTable();
         lblNombreRol = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        btnAgregar3 = new javax.swing.JButton();
+        btnNuevo = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
-        btnBuscar = new javax.swing.JButton();
+        btnRefrescar = new javax.swing.JButton();
         btnModificar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
 
@@ -59,7 +78,14 @@ public class FrmRoles extends javax.swing.JInternalFrame {
         txtNombreRol.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
 
         tblRol.setBackground(new java.awt.Color(204, 255, 204));
-        tblRol.setModel(modeloTabla);
+        tblRol.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
         jScrollPane1.setViewportView(tblRol);
 
         lblNombreRol.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
@@ -67,12 +93,12 @@ public class FrmRoles extends javax.swing.JInternalFrame {
 
         jPanel5.setBackground(new java.awt.Color(153, 153, 255));
 
-        btnAgregar3.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        btnAgregar3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Agregar.png"))); // NOI18N
-        btnAgregar3.setText("Nuevo");
-        btnAgregar3.addActionListener(new java.awt.event.ActionListener() {
+        btnNuevo.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Agregar.png"))); // NOI18N
+        btnNuevo.setText("Nuevo");
+        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAgregar3ActionPerformed(evt);
+                btnNuevoActionPerformed(evt);
             }
         });
 
@@ -85,12 +111,12 @@ public class FrmRoles extends javax.swing.JInternalFrame {
             }
         });
 
-        btnBuscar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Icono1.png"))); // NOI18N
-        btnBuscar.setText("Buscar");
-        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+        btnRefrescar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        btnRefrescar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Icono1.png"))); // NOI18N
+        btnRefrescar.setText("Refrescar");
+        btnRefrescar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuscarActionPerformed(evt);
+                btnRefrescarActionPerformed(evt);
             }
         });
 
@@ -118,26 +144,26 @@ public class FrmRoles extends javax.swing.JInternalFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnAgregar3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnModificar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEliminar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addComponent(btnModificar)
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addComponent(btnRefrescar, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnAgregar3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnEliminar)
-                    .addComponent(btnBuscar)
+                    .addComponent(btnRefrescar)
                     .addComponent(btnModificar))
                 .addContainerGap())
         );
@@ -194,34 +220,39 @@ public class FrmRoles extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnAgregar3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregar3ActionPerformed
-
+    /**
+     * Acción del botón "Nuevo". Limpia los campos para un nuevo registro.
+     */
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
         limpiarCampos();
-    }//GEN-LAST:event_btnAgregar3ActionPerformed
+    }//GEN-LAST:event_btnNuevoActionPerformed
 
+    /**
+     * Acción del botón "Guardar". Inserta un nuevo rol en la base de datos.
+     */
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         insertarRol();
-        cargarRoles();
-        
     }//GEN-LAST:event_btnGuardarActionPerformed
 
-    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        
-        seleccionarRol();
+    /**
+     * Acción del botón "Refrescar". Vuelve a cargar los datos de la tabla.
+     */
+    private void btnRefrescarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefrescarActionPerformed
         cargarRoles();
-        
-    }//GEN-LAST:event_btnBuscarActionPerformed
+    }//GEN-LAST:event_btnRefrescarActionPerformed
 
+    /**
+     * Acción del botón "Modificar". Actualiza el rol seleccionado.
+     */
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
         modificarRol();
-        cargarRoles();
-        
     }//GEN-LAST:event_btnModificarActionPerformed
 
+    /**
+     * Acción del botón "Eliminar". Elimina el rol seleccionado.
+     */
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         eliminarRol();
-        cargarRoles();
-        
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     /**
@@ -258,101 +289,141 @@ public class FrmRoles extends javax.swing.JInternalFrame {
             }
         });
     }
-   private int id_rol = 0;
-
-public void cargarRoles() {
-    modeloTabla.setRowCount(0);
-    List<rolModel> roles = rolController.obtenerTodos();
-
-    for (rolModel r : roles) {
-        modeloTabla.addRow(new Object[]{r.getId_rol(),r.getNombre_rol()});
-        
-    }
-}
-
-public void insertarRol() {
-    String nombreRol = txtNombreRol.getText().trim();
-
-    if (!nombreRol.isEmpty()) {
-        rolModel rol = new rolModel(nombreRol);
-        if (rolController.insertarRol(rol)) {
-            cargarRoles();
-            limpiarCampos();
-            JOptionPane.showMessageDialog(this, "Rol agregado correctamente.");
-        } else {
-            JOptionPane.showMessageDialog(this, "Error al agregar el rol.");
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Ingrese el nombre del rol.");
-    }
-}
-
-private void seleccionarRol() {
-    tblRol.getSelectionModel().addListSelectionListener(e -> {
-        if (!e.getValueIsAdjusting()) {
-            int fila = tblRol.getSelectedRow();
-            if (fila != -1) {
-                id_rol = Integer.parseInt(tblRol.getValueAt(fila, 0).toString());
-                txtNombreRol.setText(tblRol.getValueAt(fila, 1).toString());
-            }
-        }
-    });
-}
-
- public void modificarRol() {
-    int filaSeleccionada = tblRol.getSelectedRow();
-    if (filaSeleccionada == -1) {
-        JOptionPane.showMessageDialog(this, "Selecciona un vehículo para modificar.");
-        return;
-    }
-     int id_rol = (int) tblRol.getValueAt(filaSeleccionada, 0);
-    String nombre_rol = txtNombreRol.getText();
     
-   
-    rolModel rol = new rolModel(id_rol,nombre_rol);
-    boolean resultado = rolController.modificarRol(rol);
+    // --- MÉTODOS DE LÓGICA ---
 
-    if (resultado) {
-        JOptionPane.showMessageDialog(this, "Rol modificado correctamente.");
-        cargarRoles();
-    } else {
-        JOptionPane.showMessageDialog(this, "Error al modificar el Rol.");
+    /**
+     * Carga o recarga la lista de roles desde la base de datos y la muestra en la tabla.
+     */
+    private void cargarRoles() {
+        modeloTabla.setRowCount(0); // Limpia la tabla antes de cargar
+        List<rolModel> roles = rolController.obtenerTodos();
+
+        for (rolModel r : roles) {
+            modeloTabla.addRow(new Object[]{r.getId_rol(), r.getNombre_rol()});
+        }
     }
-}
 
-private void eliminarRol() {
-    int fila = tblRol.getSelectedRow();
-    if (fila != -1) {
-        int id = Integer.parseInt(tblRol.getValueAt(fila, 0).toString());
-        int opcion = JOptionPane.showConfirmDialog(this, "¿Deseas eliminar este rol?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (opcion == JOptionPane.YES_OPTION) {
-            if (rolController.eliminarRol(id)) {
+    /**
+     * Inserta un nuevo rol en la base de datos con el nombre proporcionado en el campo de texto.
+     */
+    private void insertarRol() {
+        String nombreRol = txtNombreRol.getText().trim();
+
+        if (!nombreRol.isEmpty()) {
+            rolModel rol = new rolModel(nombreRol);
+            if (rolController.insertarRol(rol)) {
+                JOptionPane.showMessageDialog(this, "Rol agregado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                 cargarRoles();
                 limpiarCampos();
-                JOptionPane.showMessageDialog(this, "Rol eliminado correctamente.");
             } else {
-                JOptionPane.showMessageDialog(this, "Error al eliminar el rol.");
+                JOptionPane.showMessageDialog(this, "Error al agregar el rol.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese el nombre del rol.", "Campo Vacío", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    /**
+     * Modifica un rol existente en la base de datos.
+     */
+    private void modificarRol() {
+        if (idRolSeleccionado == 0) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un rol de la tabla para modificar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String nombreRol = txtNombreRol.getText().trim();
+        if (!nombreRol.isEmpty()) {
+            rolModel rol = new rolModel(nombreRol);
+            rol.setId_rol(this.idRolSeleccionado); // Asigna el ID del rol a modificar
+
+            if (rolController.modificarRol(rol)) {
+                JOptionPane.showMessageDialog(this, "Rol modificado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                cargarRoles();
+                limpiarCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al modificar el rol.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "El nombre del rol no puede estar vacío.", "Campo Vacío", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    /**
+     * Elimina el rol seleccionado de la tabla.
+     */
+    private void eliminarRol() {
+        if (idRolSeleccionado == 0) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un rol de la tabla para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int opcion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar este rol?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (opcion == JOptionPane.YES_OPTION) {
+            if (rolController.eliminarRol(idRolSeleccionado)) {
+                JOptionPane.showMessageDialog(this, "Rol eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                cargarRoles();
+                limpiarCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al eliminar el rol.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Selecciona el rol a eliminar.");
     }
-}
 
-private void limpiarCampos() {
-    txtNombreRol.setText("");
-}
+    // --- MÉTODOS AUXILIARES ---
 
+    /**
+     * Limpia todos los campos del formulario y restablece el estado inicial.
+     */
+    private void limpiarCampos() {
+        txtNombreRol.setText("");
+        tblRol.clearSelection();
+        this.idRolSeleccionado = 0;
+        btnGuardar.setEnabled(true);
+        actualizarEstadoBotones(false);
+    }
     
-    
-  
+    /**
+     * Habilita o deshabilita los botones de Modificar y Eliminar.
+     * @param habilitar true para habilitar, false para deshabilitar.
+     */
+    private void actualizarEstadoBotones(boolean habilitar) {
+        btnModificar.setEnabled(habilitar);
+        btnEliminar.setEnabled(habilitar);
+    }
+
+    /**
+     * Configura el listener para la tabla. Se activa cuando el usuario selecciona una fila.
+     */
+    private void configurarListenerTabla() {
+        tblRol.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                // Se asegura de procesar el evento solo una vez.
+                if (!e.getValueIsAdjusting() && tblRol.getSelectedRow() != -1) {
+                    int filaSeleccionada = tblRol.getSelectedRow();
+                    
+                    // Obtiene los datos del modelo de la tabla.
+                    idRolSeleccionado = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
+                    String nombreRol = modeloTabla.getValueAt(filaSeleccionada, 1).toString();
+
+                    // Llena el campo de texto.
+                    txtNombreRol.setText(nombreRol);
+                    
+                    // Habilita/deshabilita botones.
+                    btnGuardar.setEnabled(false);
+                    actualizarEstadoBotones(true);
+                }
+            }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAgregar3;
-    private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnModificar;
+    private javax.swing.JButton btnNuevo;
+    private javax.swing.JButton btnRefrescar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
@@ -362,3 +433,4 @@ private void limpiarCampos() {
     private javax.swing.JTextField txtNombreRol;
     // End of variables declaration//GEN-END:variables
 }
+

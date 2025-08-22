@@ -6,7 +6,6 @@ package mx.edu.utxicotepec.fastybunny.view;
 
 import java.util.List;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import mx.edu.utxicotepec.fastybunny.controller.rolController;
 import mx.edu.utxicotepec.fastybunny.controller.usuarioController;
@@ -18,20 +17,36 @@ import mx.edu.utxicotepec.fastybunny.model.usuarioModel;
  * @author PC-05
  */
 public class FrmUsuarios extends javax.swing.JInternalFrame {
-    private DefaultTableModel modeloTabla;
+    // Modelo para la tabla de usuarios
+    private final DefaultTableModel modeloTabla;
+    // ID del usuario seleccionado para operaciones de modificación/eliminación
     private int idUsuario = 0;
-    private int idRolObtenido = 1;
+
     /**
-     * Creates new form FrmUsuarios
+     * Constructor del formulario FrmUsuarios.
+     * Inicializa los componentes, configura el formulario y carga los datos iniciales.
      */
     public FrmUsuarios() {
-        super("Usuarios",true,false,false,true);
-        modeloTabla = new DefaultTableModel(new Object[]{"Id Usuario","Nombre","Telefono","Correo","Usuario","Id Rol"},1);
-        tblUsuario =new JTable(modeloTabla);
+        // Llama al constructor de JInternalFrame con título y propiedades de la ventana
+        super("Usuarios", true, true, false, true);
+        
+        // Es CRÍTICO llamar a initComponents() ANTES de cualquier manipulación de componentes.
         initComponents();
-        cargarUsuario();
-        obtenerIdRol();
-        obtenerRol();
+
+        // Define el modelo de la tabla con las columnas correspondientes.
+        // Se ha eliminado la contraseña de la vista por seguridad.
+        modeloTabla = new DefaultTableModel(new Object[]{"ID", "Nombre", "Teléfono", "Correo", "Rol"}, 0);
+        tblUsuarios.setModel(modeloTabla); // Aplica el modelo a la tabla
+
+        // Carga los datos iniciales
+        cargarRoles(); // Carga los roles en el ComboBox
+        cargarUsuarios(); // Carga los usuarios en la tabla
+        
+        // Añade el listener para la selección de filas en la tabla
+        agregarListenerTabla();
+        
+        // Configura el estado inicial de los botones
+        habilitarBotones(true, false, false, false); // Nuevo:Sí, Guardar:No, Modificar:No, Eliminar:No
     }
 
     /**
@@ -44,63 +59,75 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        lblUsuario = new javax.swing.JLabel();
+        lblTitulo = new javax.swing.JLabel();
         txtNombre = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblUsuario = new javax.swing.JTable();
-        lblNombreRol = new javax.swing.JLabel();
-        lblNombreRol4 = new javax.swing.JLabel();
-        lblNombreRol7 = new javax.swing.JLabel();
+        tblUsuarios = new javax.swing.JTable();
+        lblNombre = new javax.swing.JLabel();
+        lblContraseña = new javax.swing.JLabel();
+        lblTelefono = new javax.swing.JLabel();
         txtTelefono = new javax.swing.JTextField();
-        lblNombreRol8 = new javax.swing.JLabel();
+        lblCorreo = new javax.swing.JLabel();
         txtCorreo = new javax.swing.JTextField();
         txtContraseña = new javax.swing.JPasswordField();
-        lblNombreRol9 = new javax.swing.JLabel();
+        lblRol = new javax.swing.JLabel();
         cboRol = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
         btnNuevo = new javax.swing.JButton();
         btnGuardar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnModificar = new javax.swing.JButton();
+        txtBuscar = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
 
         setClosable(true);
 
         jPanel1.setBackground(new java.awt.Color(91, 171, 185));
 
-        lblUsuario.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
-        lblUsuario.setText("Usuarios");
+        lblTitulo.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
+        lblTitulo.setText("Gestión de Usuarios");
 
         txtNombre.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
 
-        tblUsuario.setBackground(new java.awt.Color(204, 153, 255));
-        tblUsuario.setModel(modeloTabla);
-        jScrollPane1.setViewportView(tblUsuario);
+        tblUsuarios.setBackground(new java.awt.Color(204, 153, 255));
+        tblUsuarios.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
 
-        lblNombreRol.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        lblNombreRol.setText("Nombre");
+            }
+        ));
+        jScrollPane1.setViewportView(tblUsuarios);
 
-        lblNombreRol4.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        lblNombreRol4.setText("Contraseña");
+        lblNombre.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        lblNombre.setText("Nombre:");
 
-        lblNombreRol7.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        lblNombreRol7.setText("Telefono");
+        lblContraseña.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        lblContraseña.setText("Contraseña:");
+
+        lblTelefono.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        lblTelefono.setText("Teléfono:");
 
         txtTelefono.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
 
-        lblNombreRol8.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        lblNombreRol8.setText("Correo");
+        lblCorreo.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        lblCorreo.setText("Correo:");
 
         txtCorreo.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
 
         txtContraseña.setPreferredSize(new java.awt.Dimension(64, 25));
 
-        lblNombreRol9.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        lblNombreRol9.setText("Rol del Usuario");
+        lblRol.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        lblRol.setText("Rol del Usuario:");
 
         cboRol.setPreferredSize(new java.awt.Dimension(65, 25));
 
         jPanel2.setBackground(new java.awt.Color(0, 153, 153));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Acciones", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 12), new java.awt.Color(255, 255, 255))); // NOI18N
 
         btnNuevo.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
         btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Agregar.png"))); // NOI18N
@@ -121,7 +148,7 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
         });
 
         btnEliminar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Imagen3.png"))); // NOI18N
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Eliminar.png"))); // NOI18N
         btnEliminar.setText("Eliminar");
         btnEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -138,32 +165,19 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
             }
         });
 
-        btnBuscar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Icono1.png"))); // NOI18N
-        btnBuscar.setText("Buscar");
-        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuscarActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnNuevo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnModificar, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE))
-                .addContainerGap())
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(76, 76, 76)
-                .addComponent(btnEliminar)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnModificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnNuevo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                    .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -173,95 +187,102 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnModificar)
-                    .addComponent(btnBuscar))
                 .addGap(18, 18, 18)
-                .addComponent(btnEliminar)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnModificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
+
+        txtBuscar.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 14)); // NOI18N
+
+        btnBuscar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
+        btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Icono1.png"))); // NOI18N
+        btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(31, 31, 31)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(18, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 770, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(43, 43, 43)
-                                .addComponent(lblUsuario))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(49, 49, 49)
+                        .addComponent(lblTitulo)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(lblNombreRol)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(lblNombreRol8)
-                                            .addComponent(lblNombreRol7)
-                                            .addComponent(lblNombreRol4)
-                                            .addComponent(lblNombreRol9))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(cboRol, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addGap(57, 57, 57)
-                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                                    .addComponent(lblCorreo)
+                                    .addComponent(lblTelefono)
+                                    .addComponent(lblContraseña)
+                                    .addComponent(lblRol)
+                                    .addComponent(lblNombre))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cboRol, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnBuscar)))
+                        .addGap(35, 35, 35))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addComponent(lblUsuario)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblTitulo)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblNombreRol))
+                            .addComponent(lblNombre))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblNombreRol7)
+                            .addComponent(lblTelefono)
                             .addComponent(txtTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblNombreRol8)
-                            .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblNombreRol4)
-                            .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(24, 24, 24))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)))
+                            .addComponent(lblCorreo)
+                            .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblContraseña)
+                    .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cboRol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNombreRol9))
-                .addGap(75, 75, 75)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
-                .addGap(73, 73, 73))
+                    .addComponent(lblRol))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBuscar)
+                    .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                .addGap(21, 21, 21))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -273,216 +294,262 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         eliminarUsuario();
-        cargarUsuario();
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         insertarUsuario();
-        cargarUsuario();
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         buscarUsuario();
-        cargarUsuario();
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
         modificarUsuario();
-        cargarUsuario();
-
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
         limpiarCampos();
+        habilitarBotones(true, true, false, false); // Nuevo:Sí, Guardar:Sí, Modificar:No, Eliminar:No
+        tblUsuarios.clearSelection(); // Deselecciona cualquier fila en la tabla
+        cargarUsuarios(); // Recarga todos los usuarios por si se estaba mostrando una búsqueda
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     /**
-     * @param args the command line arguments
+     * Carga todos los usuarios desde la base de datos y los muestra en la tabla.
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FrmUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FrmUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FrmUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FrmUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FrmUsuarios().setVisible(true);
-            }
-        });
-    }
-  public void cargarUsuario() {
-    modeloTabla.setRowCount(0); // Limpiar tabla
-    List<usuarioModel> usuarios = usuarioController.obtenerTodos();
-
-    for (usuarioModel u : usuarios) {
-        modeloTabla.addRow(new Object[]{
-            u.getIdUsuario(),
-            u.getNombre(),
-            u.getCorreo(),
-            u.getContraseña(),
-            u.getTelefono(),
-            u.getIdRol()
-        });
-    }
-}
-
-public void insertarUsuario() {
-    String nombre = txtNombre.getText().trim();
-    String correo = txtCorreo.getText().trim();
-    String contraseña = String.valueOf(txtContraseña.getPassword());
-    String telefono = txtTelefono.getText().trim();
-    int idRol = idRolObtenido;
-
-    if (!nombre.isEmpty() && !correo.isEmpty() && !contraseña.isEmpty() && !telefono.isEmpty()) {
-        usuarioModel usuario = new usuarioModel(nombre, correo, contraseña, telefono, idRol);
-        if (usuarioController.insertarUsuario(usuario)) {
-            cargarUsuario();
-            limpiarCampos();
-            JOptionPane.showMessageDialog(this, "Usuario agregado correctamente.");
-        } else {
-            JOptionPane.showMessageDialog(this, "Error al agregar el usuario.");
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Llenar todos los campos");
-    }
-}
-
-private void buscarUsuario() {
-    String nombre = JOptionPane.showInputDialog("Ingrese el nombre");
-    if (nombre != null && !nombre.trim().isEmpty()) {
+    public void cargarUsuarios() {
+        // Limpia la tabla antes de cargar nuevos datos
         modeloTabla.setRowCount(0);
-        List<usuarioModel> usuarios = usuarioController.buscarUsuarioPorNombre(nombre);
+        
+        // Obtiene la lista de todos los usuarios desde el controlador
+        List<usuarioModel> usuarios = usuarioController.obtenerTodos();
+        
+        // Itera sobre la lista de usuarios para agregarlos a la tabla
         for (usuarioModel u : usuarios) {
+            // Obtiene el nombre del rol a partir de su ID
+            rolModel rol = rolController.obtenerRolPorId(u.getIdRol());
+            String nombreRol = (rol != null) ? rol.getNombre_rol() : "No asignado";
+
+            // Agrega una nueva fila al modelo de la tabla
             modeloTabla.addRow(new Object[]{
                 u.getIdUsuario(),
                 u.getNombre(),
-                u.getCorreo(),
-                u.getContraseña(),
                 u.getTelefono(),
-                u.getIdRol()
+                u.getCorreo(),
+                nombreRol // Muestra el nombre del rol en lugar del ID
             });
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Ingrese el nombre del usuario");
     }
-}
+    
+    /**
+     * Carga todos los roles disponibles en el ComboBox para la asignación de roles.
+     */
+    private void cargarRoles() {
+        cboRol.removeAllItems(); // Limpia los items existentes
+        List<rolModel> roles = rolController.obtenerTodos();
+        for (rolModel rol : roles) {
+            cboRol.addItem(rol); // Agrega el objeto rolModel completo
+        }
+    }
 
-private void seleccionarUsuario() {
-    tblUsuario.getSelectionModel().addListSelectionListener(e -> {
-        if (!e.getValueIsAdjusting()) {
-            int fila = tblUsuario.getSelectedRow();
-            if (fila != -1) {
-                idUsuario = Integer.parseInt(tblUsuario.getValueAt(fila, 0).toString());
-                txtNombre.setText(tblUsuario.getValueAt(fila, 1).toString());
-                txtCorreo.setText(tblUsuario.getValueAt(fila, 2).toString());
-                txtContraseña.setText(tblUsuario.getValueAt(fila, 3).toString());
-                txtTelefono.setText(tblUsuario.getValueAt(fila, 4).toString());
-                int idRol = Integer.parseInt(tblUsuario.getValueAt(fila, 5).toString());
+    /**
+     * Inserta un nuevo usuario en la base de datos con los datos del formulario.
+     */
+    public void insertarUsuario() {
+        // Validar que los campos no estén vacíos
+        if (txtNombre.getText().trim().isEmpty() ||
+            txtCorreo.getText().trim().isEmpty() ||
+            String.valueOf(txtContraseña.getPassword()).trim().isEmpty() ||
+            txtTelefono.getText().trim().isEmpty() ||
+            cboRol.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
+        // Recolecta los datos del formulario
+        String nombre = txtNombre.getText().trim();
+        String correo = txtCorreo.getText().trim();
+        String contraseña = String.valueOf(txtContraseña.getPassword());
+        String telefono = txtTelefono.getText().trim();
+        
+        // Obtiene el rol seleccionado del ComboBox
+        rolModel rolSeleccionado = (rolModel) cboRol.getSelectedItem();
+        int idRol = rolSeleccionado.getId_rol();
+
+        // Crea el objeto usuarioModel
+        usuarioModel usuario = new usuarioModel(nombre, correo, contraseña, telefono, idRol);
+        
+        // Llama al controlador para insertar el usuario
+        if (usuarioController.insertarUsuario(usuario)) {
+            JOptionPane.showMessageDialog(this, "Usuario agregado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            cargarUsuarios(); // Recarga la tabla
+            limpiarCampos(); // Limpia el formulario
+            habilitarBotones(true, false, false, false); // Restablece los botones
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al agregar el usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Busca usuarios por nombre y actualiza la tabla con los resultados.
+     */
+    private void buscarUsuario() {
+        String nombre = txtBuscar.getText().trim();
+        if (nombre.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingrese un nombre para buscar.", "Campo Vacío", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        modeloTabla.setRowCount(0); // Limpia la tabla
+        List<usuarioModel> usuarios = usuarioController.buscarUsuarioPorNombre(nombre);
+        
+        if (usuarios.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No se encontraron usuarios con ese nombre.", "Sin Resultados", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            for (usuarioModel u : usuarios) {
+                rolModel rol = rolController.obtenerRolPorId(u.getIdRol());
+                String nombreRol = (rol != null) ? rol.getNombre_rol() : "No asignado";
+                modeloTabla.addRow(new Object[]{
+                    u.getIdUsuario(),
+                    u.getNombre(),
+                    u.getTelefono(),
+                    u.getCorreo(),
+                    nombreRol
+                });
+            }
+        }
+        limpiarCampos();
+        habilitarBotones(true, false, false, false);
+    }
+
+    /**
+     * Agrega un listener a la tabla para detectar la selección de una fila.
+     * Cuando se selecciona una fila, los datos del usuario se cargan en el formulario.
+     */
+    private void agregarListenerTabla() {
+        tblUsuarios.getSelectionModel().addListSelectionListener(e -> {
+            // El evento se dispara dos veces, el "if" evita la doble ejecución
+            if (!e.getValueIsAdjusting() && tblUsuarios.getSelectedRow() != -1) {
+                int filaSeleccionada = tblUsuarios.getSelectedRow();
+                
+                // Obtiene el ID del usuario de la primera columna (columna 0)
+                idUsuario = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
+                
+                // Rellena los campos del formulario con los datos de la fila seleccionada
+                txtNombre.setText(modeloTabla.getValueAt(filaSeleccionada, 1).toString());
+                txtTelefono.setText(modeloTabla.getValueAt(filaSeleccionada, 2).toString());
+                txtCorreo.setText(modeloTabla.getValueAt(filaSeleccionada, 3).toString());
+                
+                // La contraseña no se carga por seguridad, se deja en blanco.
+                txtContraseña.setText("");
+
+                // Selecciona el rol correspondiente en el ComboBox
+                String nombreRol = modeloTabla.getValueAt(filaSeleccionada, 4).toString();
                 for (int i = 0; i < cboRol.getItemCount(); i++) {
-                    rolModel rol = (rolModel) cboRol.getItemAt(i);
-                    if (rol.getId_rol() == idRol) {
+                    if (cboRol.getItemAt(i).toString().equals(nombreRol)) {
                         cboRol.setSelectedIndex(i);
                         break;
                     }
                 }
+                
+                // Habilita los botones para modificar y eliminar
+                habilitarBotones(true, false, true, true);
             }
-        }
-    });
-}
+        });
+    }
 
-private void eliminarUsuario() {
-    int fila = tblUsuario.getSelectedRow();
-    if (fila != -1) {
-        int id = Integer.parseInt(tblUsuario.getValueAt(fila, 0).toString());
-        int opcion = JOptionPane.showConfirmDialog(this, "¿Deseas eliminar este usuario?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (opcion == JOptionPane.YES_OPTION) {
-            if (usuarioController.eliminarUsuario(id)) {
-                cargarUsuario();
+    /**
+     * Elimina el usuario seleccionado en la tabla.
+     */
+    private void eliminarUsuario() {
+        if (idUsuario == 0) {
+            JOptionPane.showMessageDialog(this, "Seleccione un usuario de la tabla para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar este usuario?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+        
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            if (usuarioController.eliminarUsuario(idUsuario)) {
+                JOptionPane.showMessageDialog(this, "Usuario eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                cargarUsuarios();
                 limpiarCampos();
-                JOptionPane.showMessageDialog(this, "Usuario eliminado correctamente.");
+                habilitarBotones(true, false, false, false);
             } else {
-                JOptionPane.showMessageDialog(this, "Error al eliminar el usuario.");
+                JOptionPane.showMessageDialog(this, "Error al eliminar el usuario.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Selecciona el usuario a eliminar");
     }
-}
 
-private void modificarUsuario() {
-    int fila = tblUsuario.getSelectedRow();
-    if (fila == -1) {
-        JOptionPane.showMessageDialog(this, "Seleccione un usuario a modificar.");
-        return;
-    }
-    int idUsuario = Integer.parseInt(tblUsuario.getValueAt(fila, 0).toString());
-    
-    String nombre = txtNombre.getText().trim();
-    String correo = txtCorreo.getText().trim();
-    String contraseña = String.valueOf(txtContraseña.getPassword());
-    String telefono = txtTelefono.getText().trim();
-    int idRol = cboRol.getSelectedIndex(); // si tienes un comboBox de roles
-    
-    usuarioModel usuario = new usuarioModel(nombre, correo, contraseña, telefono, idRol);
-    usuario.setIdUsuario(idUsuario);
-
-    if (usuarioController.modificarUsuario(usuario)) {
-        JOptionPane.showMessageDialog(this, "Usuario modificado correctamente.");
-        cargarUsuario();  // método que refresca la tabla
-        limpiarCampos();
-    } else {
-        JOptionPane.showMessageDialog(this, "Error al modificar el usuario.");
-    }
-}
-
-private void obtenerRol() {
-    cboRol.removeAllItems();
-    List<rolModel> roles = rolController.obtenerTodos();
-    for (rolModel rol : roles) {
-        cboRol.addItem(rol);
-    }
-}
-
-private void obtenerIdRol() {
-    cboRol.addActionListener(e -> {
-        rolModel seleccionado = (rolModel) cboRol.getSelectedItem();
-        if (seleccionado != null) {
-            idRolObtenido = seleccionado.getId_rol();
+    /**
+     * Modifica los datos del usuario seleccionado con la información del formulario.
+     */
+    private void modificarUsuario() {
+        if (idUsuario == 0) {
+            JOptionPane.showMessageDialog(this, "Seleccione un usuario de la tabla para modificar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-    });
-}
-
-private void limpiarCampos() {
-    txtNombre.setText("");
-    txtCorreo.setText("");
-    txtContraseña.setText("");
-    txtTelefono.setText("");
-    cboRol.setSelectedIndex(-1);
-    idUsuario = 0;
-}
-
+        
+        // Validar que los campos no estén vacíos
+        if (txtNombre.getText().trim().isEmpty() ||
+            txtCorreo.getText().trim().isEmpty() ||
+            txtTelefono.getText().trim().isEmpty() ||
+            cboRol.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Los campos nombre, correo, teléfono y rol son obligatorios.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
     
+        String nombre = txtNombre.getText().trim();
+        String correo = txtCorreo.getText().trim();
+        String contraseña = String.valueOf(txtContraseña.getPassword());
+        String telefono = txtTelefono.getText().trim();
+        rolModel rolSeleccionado = (rolModel) cboRol.getSelectedItem();
+        int idRol = rolSeleccionado.getId_rol();
+        
+        // Si el campo de contraseña está vacío, no se actualiza.
+        // El controlador debe estar preparado para manejar una contraseña vacía o nula.
+        usuarioModel usuario = new usuarioModel(nombre, correo, contraseña, telefono, idRol);
+        usuario.setIdUsuario(idUsuario);
+
+        if (usuarioController.modificarUsuario(usuario)) {
+            JOptionPane.showMessageDialog(this, "Usuario modificado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            cargarUsuarios();
+            limpiarCampos();
+            habilitarBotones(true, false, false, false);
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al modificar el usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Limpia todos los campos de entrada del formulario y restablece las variables de estado.
+     */
+    private void limpiarCampos() {
+        txtNombre.setText("");
+        txtCorreo.setText("");
+        txtContraseña.setText("");
+        txtTelefono.setText("");
+        txtBuscar.setText("");
+        cboRol.setSelectedIndex(-1); // Deselecciona cualquier rol
+        idUsuario = 0; // Resetea el ID del usuario seleccionado
+        tblUsuarios.clearSelection(); // Deselecciona la fila en la tabla
+        habilitarBotones(true, false, false, false);
+    }
+    
+    /**
+     * Controla el estado (activado/desactivado) de los botones de acción.
+     * @param nuevo Habilita o deshabilita el botón "Nuevo".
+     * @param guardar Habilita o deshabilita el botón "Guardar".
+     * @param modificar Habilita o deshabilita el botón "Modificar".
+     * @param eliminar Habilita o deshabilita el botón "Eliminar".
+     */
+    private void habilitarBotones(boolean nuevo, boolean guardar, boolean modificar, boolean eliminar) {
+        btnNuevo.setEnabled(nuevo);
+        btnGuardar.setEnabled(guardar);
+        btnModificar.setEnabled(modificar);
+        btnEliminar.setEnabled(eliminar);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
@@ -494,13 +561,14 @@ private void limpiarCampos() {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblNombreRol;
-    private javax.swing.JLabel lblNombreRol4;
-    private javax.swing.JLabel lblNombreRol7;
-    private javax.swing.JLabel lblNombreRol8;
-    private javax.swing.JLabel lblNombreRol9;
-    private javax.swing.JLabel lblUsuario;
-    private javax.swing.JTable tblUsuario;
+    private javax.swing.JLabel lblContraseña;
+    private javax.swing.JLabel lblCorreo;
+    private javax.swing.JLabel lblNombre;
+    private javax.swing.JLabel lblRol;
+    private javax.swing.JLabel lblTelefono;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JTable tblUsuarios;
+    private javax.swing.JTextField txtBuscar;
     private javax.swing.JPasswordField txtContraseña;
     private javax.swing.JTextField txtCorreo;
     private javax.swing.JTextField txtNombre;

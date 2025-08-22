@@ -95,6 +95,30 @@ public class rolController {
     }
     
     /**
+     * Obtiene un rol específico de la base de datos a partir de su ID.
+     * @param idRol El ID del rol a buscar.
+     * @return Un objeto rolModel con los datos del rol, o null si no se encuentra.
+     */
+    public static rolModel obtenerRolPorId(int idRol) {
+        String sql = "SELECT id_rol, nombre_rol FROM rol WHERE id_rol = ?";
+        try (Connection con = conexionDB.obtenerConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idRol);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    rolModel rol = new rolModel();
+                    rol.setId_rol(rs.getInt("id_rol"));
+                    rol.setNombre_rol(rs.getString("nombre_rol"));
+                    return rol;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null; // Devuelve null si no se encuentra el rol o si hay un error
+    }
+
+    /**
      * Busca roles en la base de datos cuyo nombre coincida con el término de búsqueda.
      * @param nombreBusqueda El nombre o parte del nombre del rol a buscar.
      * @return Una lista de objetos rolModel que coinciden con la búsqueda.

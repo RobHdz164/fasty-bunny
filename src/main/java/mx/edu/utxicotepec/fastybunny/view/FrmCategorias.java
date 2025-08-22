@@ -4,29 +4,83 @@
  */
 package mx.edu.utxicotepec.fastybunny.view;
 
-
+import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import mx.edu.utxicotepec.fastybunny.controller.categoriasController;
 import mx.edu.utxicotepec.fastybunny.model.categoriaModel;
 
 /**
- *
+ * Formulario para la gestión de Categorías (CRUD).
+ * Permite al usuario agregar, modificar, eliminar y consultar las categorías de productos.
  * @author PC-05
  */
 public class FrmCategorias extends javax.swing.JInternalFrame {
     private DefaultTableModel modeloTabla;
 
     /**
-     * Creates new form FrmRoles
+     * Constructor del formulario FrmCategorias.
      */
     public FrmCategorias() {
-        super("Roles de Usuario",true,false,false,true);
-        modeloTabla = new DefaultTableModel(new Object[]{"Id Rol","Nombre"},0);
-        tblCategorias=new JTable(modeloTabla);
-        cargarCategorias();
+        // Título de la ventana y propiedades del JInternalFrame.
+        super("Categorías", true, false, false, true);
+        // Se inicializa el modelo de la tabla con las columnas correctas.
+        modeloTabla = new DefaultTableModel(new Object[]{"Id Categoria", "Nombre"}, 0);
+        
+        // Se inicializan los componentes gráficos generados por el diseñador.
         initComponents();
+        
+        // Se asigna el modelo a la tabla (debe hacerse después de initComponents).
+        tblCategorias.setModel(modeloTabla);
+        
+        // Se cargan los datos iniciales en la tabla.
+        cargarCategorias();
+        
+        // Se configura el listener para la selección de filas en la tabla.
+        configurarListenerTabla();
+    }
+    
+    /**
+     * Configura un listener para detectar la selección de una fila en la tabla.
+     * Cuando se selecciona una fila, los datos se cargan en el campo de texto.
+     */
+    private void configurarListenerTabla() {
+        tblCategorias.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent event) {
+                // Se evita la doble notificación del evento.
+                if (!event.getValueIsAdjusting() && tblCategorias.getSelectedRow() != -1) {
+                    int filaSeleccionada = tblCategorias.getSelectedRow();
+                    // Se obtiene el nombre de la categoría de la columna 1 y se muestra en el campo de texto.
+                    txtNombre.setText(tblCategorias.getValueAt(filaSeleccionada, 1).toString());
+                }
+            }
+        });
+    }
+    
+    /**
+     * Carga o recarga todas las categorías desde la base de datos y las muestra en la tabla.
+     */
+    private void cargarCategorias() {
+        // Limpia el modelo de la tabla para evitar duplicados.
+        modeloTabla.setRowCount(0);
+        // Obtiene la lista de categorías desde el controlador.
+        List<categoriaModel> categorias = categoriasController.obtenerTodas();
+        // Itera sobre la lista y agrega cada categoría como una nueva fila en la tabla.
+        for (categoriaModel categoria : categorias) {
+            modeloTabla.addRow(new Object[]{categoria.getIdCategoria(), categoria.getNombreCategoria()});
+        }
+    }
+    
+    /**
+     * Limpia el campo de texto y deselecciona cualquier fila en la tabla.
+     */
+    private void limpiarCampos() {
+        txtNombre.setText("");
+        tblCategorias.clearSelection();
     }
 
     /**
@@ -61,7 +115,14 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
         txtNombre.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
 
         tblCategorias.setBackground(new java.awt.Color(204, 255, 204));
-        tblCategorias.setModel(modeloTabla);
+        tblCategorias.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
         jScrollPane1.setViewportView(tblCategorias);
 
         lblNombreRol.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
@@ -198,142 +259,115 @@ public class FrmCategorias extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción del botón "Nuevo".
+     * Limpia los campos del formulario para una nueva entrada.
+     * @param evt Evento de acción.
+     */
     private void btnAgregar3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregar3ActionPerformed
-
-       
+        limpiarCampos();
     }//GEN-LAST:event_btnAgregar3ActionPerformed
 
+    /**
+     * Acción del botón "Guardar".
+     * Inserta una nueva categoría con el nombre proporcionado en el campo de texto.
+     * @param evt Evento de acción.
+     */
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-
-         agregarCategoria();
-        cargarCategorias();
+        String nombre = txtNombre.getText();
+        // Validación para asegurar que el nombre no esté vacío.
+        if (nombre.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El nombre de la categoría no puede estar vacío.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        categoriaModel categoria = new categoriaModel(nombre);
+        if (categoriasController.insertarCategoria(categoria)) {
+            JOptionPane.showMessageDialog(this, "Categoría guardada exitosamente.");
+            cargarCategorias(); // Recarga la tabla para mostrar la nueva categoría.
+            limpiarCampos();   // Limpia el formulario.
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al guardar la categoría.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    /**
+     * Acción del botón "Buscar".
+     * (Funcionalidad pendiente de implementación en el controlador).
+     * @param evt Evento de acción.
+     */
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        
+        // Lógica de búsqueda (requiere un método en el controlador, por ejemplo, buscarPorNombre).
+        String busqueda = JOptionPane.showInputDialog(this, "Ingrese el nombre de la categoría a buscar:");
+        if (busqueda != null && !busqueda.trim().isEmpty()) {
+            // Aquí iría la llamada al método del controlador y la actualización de la tabla.
+            // Ejemplo: List<categoriaModel> resultados = categoriasController.buscarPorNombre(busqueda);
+            // y luego actualizar la tabla con los resultados.
+            JOptionPane.showMessageDialog(this, "Funcionalidad de búsqueda no implementada aún.");
+        }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
+    /**
+     * Acción del botón "Modificar".
+     * Actualiza el nombre de la categoría seleccionada.
+     * @param evt Evento de acción.
+     */
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-         modificarCategoria();
-        cargarCategorias();
+        int filaSeleccionada = tblCategorias.getSelectedRow();
         
+        // Verifica si se ha seleccionado una fila.
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione una categoría para modificar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String nombre = txtNombre.getText();
+        // Validación para asegurar que el nuevo nombre no esté vacío.
+        if (nombre.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El nombre de la categoría no puede estar vacío.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        int idCategoria = (int) tblCategorias.getValueAt(filaSeleccionada, 0);
+        categoriaModel categoria = new categoriaModel(idCategoria, nombre);
+        
+        if (categoriasController.actualizarCategoria(categoria)) {
+            JOptionPane.showMessageDialog(this, "Categoría modificada exitosamente.");
+            cargarCategorias(); // Recarga la tabla.
+            limpiarCampos();   // Limpia el formulario.
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al modificar la categoría.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnModificarActionPerformed
 
+    /**
+     * Acción del botón "Eliminar".
+     * Elimina la categoría seleccionada en la tabla.
+     * @param evt Evento de acción.
+     */
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-         eliminarCategoria();
-        cargarCategorias();
+        int filaSeleccionada = tblCategorias.getSelectedRow();
         
+        // Verifica si se ha seleccionado una fila.
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione una categoría para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Pide confirmación al usuario antes de eliminar.
+        int confirmacion = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar esta categoría?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            int idCategoria = (int) tblCategorias.getValueAt(filaSeleccionada, 0);
+            if (categoriasController.eliminarCategoria(idCategoria)) {
+                JOptionPane.showMessageDialog(this, "Categoría eliminada exitosamente.");
+                cargarCategorias(); // Recarga la tabla.
+                limpiarCampos();   // Limpia el formulario.
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al eliminar la categoría.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FrmRoles.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FrmRoles.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FrmRoles.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FrmRoles.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FrmCategorias().setVisible(true);
-            }
-        });
-    }
-   private void agregarCategoria() {
-    String nombre = txtNombre.getText();
-    if (!nombre.isEmpty()) {
-        categoriaModel categoria = new categoriaModel();
-        categoria.setNombreCategoria(nombre);
-        if (categoriasController.insertarCategoria(categoria)) {
-            JOptionPane.showMessageDialog(this, "Categoría agregada correctamente.");
-            limpiarCampos();
-            cargarCategorias(); // refresca JTable
-        } else {
-            JOptionPane.showMessageDialog(this, "Error al agregar categoría.");
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío.");
-    }
-   }   
-    private void modificarCategoria() {
-    int fila = tblCategorias.getSelectedRow();
-    if (fila != -1) {
-        int id = Integer.parseInt(tblCategorias.getValueAt(fila, 0).toString());
-        String nuevoNombre = txtNombre.getText();
-
-        if (!nuevoNombre.isEmpty()) {
-            categoriaModel categoria = new categoriaModel();
-            categoria.setIdCategoria(id);
-            categoria.setNombreCategoria(nuevoNombre);
-            if (categoriasController.actualizarCategoria(categoria)) {
-                JOptionPane.showMessageDialog(this, "Categoría actualizada.");
-                limpiarCampos();
-                cargarCategorias();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al actualizar.");
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío.");
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Selecciona una fila para modificar.");
-    }
-}
-    private void eliminarCategoria() {
-    int fila = tblCategorias.getSelectedRow();
-    if (fila != -1) {
-        int id = Integer.parseInt(tblCategorias.getValueAt(fila, 0).toString());
-        int confirm = JOptionPane.showConfirmDialog(this, "¿Eliminar esta categoría?", "Confirmar", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            if (categoriasController.eliminarCategoria(id)) {
-                JOptionPane.showMessageDialog(this, "Categoría eliminada.");
-                limpiarCampos();
-                cargarCategorias();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al eliminar.");
-            }
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Selecciona una fila para eliminar.");
-    }
-}
-
-    private void cargarCategorias() {
-    DefaultTableModel modelo = (DefaultTableModel) tblCategorias.getModel();
-    modelo.setRowCount(0);
-    for (categoriaModel c : categoriasController.obtenerTodas()) {
-        Object[] fila = {c.getIdCategoria(), c.getNombreCategoria()};
-        modelo.addRow(fila);
-    }
-}
-
-
-   private void limpiarCampos() {
-    txtNombre.setText("");
-}
-
-    
-  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar3;

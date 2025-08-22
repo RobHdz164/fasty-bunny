@@ -5,39 +5,52 @@
 package mx.edu.utxicotepec.fastybunny.view;
 
 import java.util.List;
-
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-
-import mx.edu.utxicotepec.fastybunny.controller.productoController;
 import mx.edu.utxicotepec.fastybunny.controller.categoriasController;
+import mx.edu.utxicotepec.fastybunny.controller.productoController;
 import mx.edu.utxicotepec.fastybunny.controller.usuarioController;
 import mx.edu.utxicotepec.fastybunny.model.categoriaModel;
 import mx.edu.utxicotepec.fastybunny.model.productoModel;
 import mx.edu.utxicotepec.fastybunny.model.usuarioModel;
 
-
 /**
- *
+ * Formulario para la gestión de Productos (CRUD).
+ * Permite agregar, modificar, eliminar y consultar productos en el sistema.
  * @author PC-04
  */
 public class FrmProductos extends javax.swing.JInternalFrame {
- private DefaultTableModel modeloTabla;
+    private DefaultTableModel modeloTabla;
+    private int idProducto = 0; // Almacena el ID del producto seleccionado en la tabla
+
     /**
-     * Creates new form FrmRegistrarS
+     * Constructor del formulario FrmProductos.
+     * Se encarga de inicializar los componentes, configurar la tabla y cargar los datos iniciales.
      */
     public FrmProductos() {
-    super("Productos",true,false,false,true);
-    modeloTabla = new DefaultTableModel(new Object []{"id Producto","Nombre","Descripcion","Precio","Id Vendedor", "Id Categoria"},0);
-    tblProductos = new JTable(modeloTabla);
-    initComponents();
-    cargarProductos();
-    obtenerVendedores();
-    obtenerIdVendedor();
-    obtenerCategorias();
-    obtenerIdCategoria();
-}
+        super("Productos", true, false, false, true);
+        
+        // CORRECCIÓN CRÍTICA: initComponents() debe ser llamado ANTES de manipular cualquier componente.
+        initComponents();
+
+        // Se inicializa el modelo de la tabla y se asigna al JTable existente.
+        modeloTabla = new DefaultTableModel(new Object[]{"ID", "Nombre", "Descripción", "Precio", "ID Vendedor", "ID Categoría"}, 0);
+        tblProductos.setModel(modeloTabla);
+
+        // Carga los datos iniciales en la tabla y los ComboBoxes.
+        cargarProductos();
+        cargarVendedores();
+        cargarCategorias();
+        
+        // Se añade el listener para la selección de filas en la tabla.
+        configurarListenerTabla();
+        
+        // Se asegura que los botones de modificar y eliminar estén desactivados al inicio.
+        actualizarEstadoBotones(false);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -58,7 +71,7 @@ public class FrmProductos extends javax.swing.JInternalFrame {
         lblNombreRol2 = new javax.swing.JLabel();
         txtPrecio = new javax.swing.JTextField();
         lblNombreRol9 = new javax.swing.JLabel();
-        cboVendedor = new javax.swing.JComboBox<>();
+        cboVendedor = new javax.swing.JComboBox<usuarioModel>();
         lblUsuario = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         btnAgregar = new javax.swing.JButton();
@@ -66,7 +79,7 @@ public class FrmProductos extends javax.swing.JInternalFrame {
         btnBuscar = new javax.swing.JButton();
         btnModificar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
-        cboCategoria = new javax.swing.JComboBox<>();
+        cboCategoria = new javax.swing.JComboBox<categoriaModel>();
         lblNombreRol10 = new javax.swing.JLabel();
 
         setClosable(true);
@@ -75,8 +88,14 @@ public class FrmProductos extends javax.swing.JInternalFrame {
         jPanel1.setBackground(new java.awt.Color(91, 171, 185));
 
         tblProductos.setBackground(new java.awt.Color(0, 204, 204));
-        tblProductos.setModel(modeloTabla
-        );
+        tblProductos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
         jScrollPane1.setViewportView(tblProductos);
 
         lblNombreRol.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
@@ -98,11 +117,6 @@ public class FrmProductos extends javax.swing.JInternalFrame {
         lblNombreRol9.setText("Vendedor");
 
         cboVendedor.setPreferredSize(new java.awt.Dimension(65, 25));
-        cboVendedor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cboVendedorActionPerformed(evt);
-            }
-        });
 
         lblUsuario.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 24)); // NOI18N
         lblUsuario.setText("Productos");
@@ -129,7 +143,7 @@ public class FrmProductos extends javax.swing.JInternalFrame {
 
         btnBuscar.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
         btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Icono1.png"))); // NOI18N
-        btnBuscar.setText("Buscar");
+        btnBuscar.setText("Refrescar");
         btnBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBuscarActionPerformed(evt);
@@ -191,11 +205,6 @@ public class FrmProductos extends javax.swing.JInternalFrame {
         );
 
         cboCategoria.setPreferredSize(new java.awt.Dimension(65, 25));
-        cboCategoria.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cboCategoriaActionPerformed(evt);
-            }
-        });
 
         lblNombreRol10.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
         lblNombreRol10.setText("Categoria");
@@ -286,38 +295,40 @@ public class FrmProductos extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Acción del botón "Nuevo". Limpia los campos del formulario para un nuevo registro.
+     */
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-
         limpiarCampos();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
+    /**
+     * Acción del botón "Guardar". Inserta un nuevo producto en la base de datos.
+     */
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-
         insertarProducto();
-        cargarProductos();
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    /**
+     * Acción del botón "Refrescar". Vuelve a cargar todos los productos desde la base de datos.
+     */
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         cargarProductos();
     }//GEN-LAST:event_btnBuscarActionPerformed
 
+    /**
+     * Acción del botón "Modificar". Actualiza el producto seleccionado en la base de datos.
+     */
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
         modificarProducto();
-        cargarProductos();
     }//GEN-LAST:event_btnModificarActionPerformed
 
+    /**
+     * Acción del botón "Eliminar". Elimina el producto seleccionado de la base de datos.
+     */
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         eliminarProducto();
-        cargarProductos();
     }//GEN-LAST:event_btnEliminarActionPerformed
-
-    private void cboVendedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboVendedorActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cboVendedorActionPerformed
-
-    private void cboCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboCategoriaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cboCategoriaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -357,142 +368,245 @@ public class FrmProductos extends javax.swing.JInternalFrame {
         });
     }
     
-   private int idProducto = 0;
-private int idVendedorObtenido = 0;
-private int idCategoriaObtenida = 0;
+    // --- MÉTODOS DE LÓGICA ---
 
-public void cargarProductos() {
-    modeloTabla.setRowCount(0);
-    List<productoModel> productos = productoController.obtenerTodos();
+    /**
+     * Carga o recarga la lista de productos desde la base de datos y la muestra en la tabla.
+     */
+    private void cargarProductos() {
+        modeloTabla.setRowCount(0); // Limpia la tabla antes de cargar nuevos datos
+        List<productoModel> productos = productoController.obtenerTodos();
 
-    for (productoModel p : productos) {
-        modeloTabla.addRow(new Object[]{
-            p.getIdProducto(),
-            p.getNombreProducto(),
-            p.getDescripcion(),
-            p.getPrecio(),
-            p.getIdVendedor(),
-            p.getIdCategoria()
+        for (productoModel p : productos) {
+            modeloTabla.addRow(new Object[]{
+                p.getIdProducto(),
+                p.getNombreProducto(),
+                p.getDescripcion(),
+                p.getPrecio(),
+                p.getIdVendedor(),
+                p.getIdCategoria()
+            });
+        }
+    }
+
+    /**
+     * Inserta un nuevo producto en la base de datos con los datos del formulario.
+     */
+    private void insertarProducto() {
+        // Validación de campos
+        if (!validarCampos()) {
+            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            // Recolección de datos del formulario
+            String nombre = txtNombre.getText().trim();
+            String descripcion = txtDescripcion.getText().trim();
+            double precio = Double.parseDouble(txtPrecio.getText().trim());
+            
+            usuarioModel vendedorSeleccionado = (usuarioModel) cboVendedor.getSelectedItem();
+            categoriaModel categoriaSeleccionada = (categoriaModel) cboCategoria.getSelectedItem();
+
+            if (vendedorSeleccionado == null || categoriaSeleccionada == null) {
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un vendedor y una categoría.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int idVendedor = vendedorSeleccionado.getIdUsuario();
+            int idCategoria = categoriaSeleccionada.getIdCategoria();
+
+            // Creación del modelo y llamada al controlador
+            productoModel p = new productoModel(nombre, descripcion, precio, idVendedor, idCategoria);
+            if (productoController.insertarProducto(p)) {
+                JOptionPane.showMessageDialog(this, "Producto agregado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                cargarProductos();
+                limpiarCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al agregar el producto.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "El precio debe ser un número válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Modifica un producto existente en la base de datos.
+     */
+    private void modificarProducto() {
+        if (idProducto == 0) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un producto de la tabla para modificar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!validarCampos()) {
+            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            String nombre = txtNombre.getText().trim();
+            String descripcion = txtDescripcion.getText().trim();
+            double precio = Double.parseDouble(txtPrecio.getText().trim());
+            
+            usuarioModel vendedorSeleccionado = (usuarioModel) cboVendedor.getSelectedItem();
+            categoriaModel categoriaSeleccionada = (categoriaModel) cboCategoria.getSelectedItem();
+
+            if (vendedorSeleccionado == null || categoriaSeleccionada == null) {
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un vendedor y una categoría.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int idVendedor = vendedorSeleccionado.getIdUsuario();
+            int idCategoria = categoriaSeleccionada.getIdCategoria();
+
+            productoModel p = new productoModel(nombre, descripcion, precio, idVendedor, idCategoria);
+            p.setIdProducto(this.idProducto); // Se asigna el ID del producto a modificar
+
+            if (productoController.actualizarProducto(p)) {
+                JOptionPane.showMessageDialog(this, "Producto modificado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                cargarProductos();
+                limpiarCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al modificar el producto.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "El precio debe ser un número válido.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Elimina el producto seleccionado de la tabla.
+     */
+    private void eliminarProducto() {
+        if (idProducto == 0) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un producto de la tabla para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int opcion = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar este producto?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (opcion == JOptionPane.YES_OPTION) {
+            if (productoController.eliminarProducto(idProducto)) {
+                JOptionPane.showMessageDialog(this, "Producto eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                cargarProductos();
+                limpiarCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al eliminar el producto.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // --- MÉTODOS AUXILIARES ---
+
+    /**
+     * Carga la lista de vendedores en el ComboBox correspondiente.
+     */
+    private void cargarVendedores() {
+        cboVendedor.removeAllItems();
+        List<usuarioModel> vendedores = usuarioController.obtenerVendedores();
+        for (usuarioModel vendedor : vendedores) {
+            cboVendedor.addItem(vendedor);
+        }
+    }
+
+    /**
+     * Carga la lista de categorías en el ComboBox correspondiente.
+     */
+    private void cargarCategorias() {
+        cboCategoria.removeAllItems();
+        List<categoriaModel> categorias = categoriasController.obtenerTodas();
+        for (categoriaModel categoria : categorias) {
+            cboCategoria.addItem(categoria);
+        }
+    }
+
+    /**
+     * Limpia todos los campos del formulario y restablece el estado inicial.
+     */
+    private void limpiarCampos() {
+        txtNombre.setText("");
+        txtDescripcion.setText("");
+        txtPrecio.setText("");
+        cboVendedor.setSelectedIndex(-1);
+        cboCategoria.setSelectedIndex(-1);
+        tblProductos.clearSelection();
+        this.idProducto = 0;
+        btnGuardar.setEnabled(true);
+        actualizarEstadoBotones(false);
+    }
+
+    /**
+     * Valida que los campos de texto no estén vacíos.
+     * @return true si todos los campos son válidos, false en caso contrario.
+     */
+    private boolean validarCampos() {
+        return !txtNombre.getText().trim().isEmpty() &&
+               !txtDescripcion.getText().trim().isEmpty() &&
+               !txtPrecio.getText().trim().isEmpty();
+    }
+    
+    /**
+     * Configura el listener para la tabla. Se activa cuando el usuario selecciona una fila.
+     */
+    private void configurarListenerTabla() {
+        tblProductos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                // El evento se dispara dos veces, con isAdjusting se asegura que solo se procese una vez.
+                if (!e.getValueIsAdjusting() && tblProductos.getSelectedRow() != -1) {
+                    int filaSeleccionada = tblProductos.getSelectedRow();
+                    
+                    // Obtener datos del modelo de la tabla
+                    idProducto = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
+                    String nombre = modeloTabla.getValueAt(filaSeleccionada, 1).toString();
+                    String descripcion = modeloTabla.getValueAt(filaSeleccionada, 2).toString();
+                    String precio = modeloTabla.getValueAt(filaSeleccionada, 3).toString();
+                    int idVendedor = (int) modeloTabla.getValueAt(filaSeleccionada, 4);
+                    int idCategoria = (int) modeloTabla.getValueAt(filaSeleccionada, 5);
+
+                    // Llenar los campos del formulario
+                    txtNombre.setText(nombre);
+                    txtDescripcion.setText(descripcion);
+                    txtPrecio.setText(precio);
+                    
+                    // Seleccionar el item correcto en los ComboBox
+                    seleccionarItemEnComboBox(cboVendedor, idVendedor);
+                    seleccionarItemEnComboBox(cboCategoria, idCategoria);
+                    
+                    // Habilitar/deshabilitar botones
+                    btnGuardar.setEnabled(false);
+                    actualizarEstadoBotones(true);
+                }
+            }
         });
     }
-}
-
-public void insertarProducto() {
-    String nombre = txtNombre.getText().trim();
-    String descripcion = txtDescripcion.getText().trim();
-    String precioText = txtPrecio.getText().trim();
-
-    if (!nombre.isEmpty() && !descripcion.isEmpty() && !precioText.isEmpty()) {
-        try {
-            double precio = Double.parseDouble(precioText);
-
-            productoModel p = new productoModel(nombre, descripcion, precio, idVendedorObtenido, idCategoriaObtenida);
-            if (productoController.insertarProducto(p)) {
-                cargarProductos();
-                limpiarCampos();
-                JOptionPane.showMessageDialog(this, "Producto agregado correctamente.");
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al agregar el producto.");
-            }
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Ingrese un precio válido.");
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Llenar todos los campos.");
+    
+    /**
+     * Habilita o deshabilita los botones de Modificar y Eliminar.
+     * @param habilitar true para habilitar, false para deshabilitar.
+     */
+    private void actualizarEstadoBotones(boolean habilitar) {
+        btnModificar.setEnabled(habilitar);
+        btnEliminar.setEnabled(habilitar);
     }
-}
-
-
-private void modificarProducto() {
-    String nombre = txtNombre.getText().trim();
-    String descripcion = txtDescripcion.getText().trim();
-    String precioText = txtPrecio.getText().trim();
-
-    if (!nombre.isEmpty() && !descripcion.isEmpty() && !precioText.isEmpty()) {
-        try {
-            double precio = Double.parseDouble(precioText);
-
-            productoModel p = new productoModel(nombre, descripcion, precio, idVendedorObtenido, idCategoriaObtenida);
-            p.setIdProducto(idProducto);
-            if (productoController.actualizarProducto(p)) {
-                cargarProductos();
-                limpiarCampos();
-                JOptionPane.showMessageDialog(this, "Producto modificado correctamente.");
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al modificar el producto.");
+    
+    /**
+     * Método genérico para seleccionar un ítem en un JComboBox basado en un ID.
+     * @param comboBox El JComboBox a modificar.
+     * @param id El ID del objeto a seleccionar.
+     */
+    private void seleccionarItemEnComboBox(javax.swing.JComboBox comboBox, int id) {
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            Object item = comboBox.getItemAt(i);
+            if (item instanceof usuarioModel && ((usuarioModel) item).getIdUsuario() == id) {
+                comboBox.setSelectedIndex(i);
+                return;
             }
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Ingrese un precio válido.");
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Llenar todos los campos.");
-    }
-}
-
-private void eliminarProducto() {
-    int fila = tblProductos.getSelectedRow();
-    if (fila != -1) {
-        int id = Integer.parseInt(tblProductos.getValueAt(fila, 0).toString());
-        int opcion = JOptionPane.showConfirmDialog(this, "¿Deseas eliminar este producto?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-        if (opcion == JOptionPane.YES_OPTION) {
-            if (productoController.eliminarProducto(id)) {
-                cargarProductos();
-                limpiarCampos();
-                JOptionPane.showMessageDialog(this, "Producto eliminado correctamente.");
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al eliminar el producto.");
+            if (item instanceof categoriaModel && ((categoriaModel) item).getIdCategoria() == id) {
+                comboBox.setSelectedIndex(i);
+                return;
             }
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Selecciona un producto a eliminar.");
     }
-}
-
-private void obtenerVendedores() {
-    cboVendedor.removeAllItems();
-    List<usuarioModel> vendedores = usuarioController.obtenerVendedores();
-    for (usuarioModel vendedor : vendedores) {
-        cboVendedor.addItem(vendedor);
-    }
-}
-
-private void obtenerIdVendedor() {
-    cboVendedor.addActionListener(e -> {
-        usuarioModel seleccionado = (usuarioModel) cboVendedor.getSelectedItem();
-        if (seleccionado != null) {
-            idVendedorObtenido = seleccionado.getIdUsuario();
-        }
-    });
-}
-
-private void obtenerCategorias() {
-    cboCategoria.removeAllItems();
-    List<categoriaModel> categorias = categoriasController.obtenerTodas();
-    for (categoriaModel categoria : categorias) {
-        cboCategoria.addItem(categoria);
-    }
-}
-
-private void obtenerIdCategoria() {
-    cboCategoria.addActionListener(e -> {
-        categoriaModel seleccionada = (categoriaModel) cboCategoria.getSelectedItem();
-        if (seleccionada != null) {
-            idCategoriaObtenida = seleccionada.getIdCategoria();
-        }
-    });
-}
-
-private void limpiarCampos() {
-    txtNombre.setText("");
-    txtDescripcion.setText("");
-    txtPrecio.setText("");
-    cboVendedor.setSelectedIndex(-1);
-    cboCategoria.setSelectedIndex(-1);
-    idProducto = 0;
-}
-
-
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;

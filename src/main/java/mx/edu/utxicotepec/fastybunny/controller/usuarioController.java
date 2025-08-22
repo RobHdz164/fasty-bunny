@@ -87,6 +87,34 @@ public class usuarioController {
     }
 
     /**
+     * Obtiene un usuario específico de la base de datos a partir de su ID.
+     * @param idUsuario El ID del usuario a buscar.
+     * @return Un objeto usuarioModel con los datos del usuario, o null si no se encuentra.
+     */
+    public static usuarioModel obtenerUsuarioPorId(int idUsuario) {
+        String sql = "SELECT * FROM usuario WHERE id_usuario = ?";
+        try (Connection con = conexionDB.obtenerConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idUsuario);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new usuarioModel(
+                        rs.getInt("id_usuario"),
+                        rs.getString("nombre"),
+                        rs.getString("correo"),
+                        rs.getString("contraseña"),
+                        rs.getString("telefono"),
+                        rs.getInt("id_rol")
+                    );
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null; // Devuelve null si no se encuentra el usuario o si hay un error
+    }
+
+    /**
      * Busca usuarios en la base de datos cuyo nombre coincida con el término de búsqueda.
      * @param nombreBusqueda El nombre o parte del nombre del usuario a buscar.
      * @return Una lista de objetos usuarioModel que coinciden con la búsqueda.

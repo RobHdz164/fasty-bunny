@@ -92,4 +92,28 @@ public class categoriasController {
         }
         return lista;
     }
+    
+    /**
+     * Obtiene una categoría específica de la base de datos a partir de su ID.
+     * @param idCategoria El ID de la categoría a buscar.
+     * @return Un objeto categoriaModel con los datos de la categoría, o null si no se encuentra.
+     */
+    public static categoriaModel obtenerCategoriaPorId(int idCategoria) {
+        String sql = "SELECT id_categoria, nombre_categoria FROM categoria WHERE id_categoria = ?";
+        try (Connection con = conexionDB.obtenerConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idCategoria);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new categoriaModel(
+                        rs.getInt("id_categoria"),
+                        rs.getString("nombre_categoria")
+                    );
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null; // Devuelve null si no se encuentra la categoría o si hay un error
+    }
 }

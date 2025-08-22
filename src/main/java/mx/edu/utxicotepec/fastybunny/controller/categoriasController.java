@@ -11,15 +11,21 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
 import mx.edu.utxicotepec.fastybunny.conexion.conexionDB;
 import mx.edu.utxicotepec.fastybunny.model.categoriaModel;
 
 /**
- *
+ * Controlador para gestionar las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) de las categorías.
  * @author Roberto
  */
 public class categoriasController {
 
+    /**
+     * Inserta una nueva categoría en la base de datos.
+     * @param categoria El objeto categoriaModel con la información a insertar.
+     * @return true si la inserción fue exitosa, false en caso contrario.
+     */
     public static boolean insertarCategoria(categoriaModel categoria) {
         String sql = "INSERT INTO categoria (nombre_categoria) VALUES (?)";
         try (Connection con = conexionDB.obtenerConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -32,6 +38,11 @@ public class categoriasController {
         }
     }
 
+    /**
+     * Actualiza una categoría existente en la base de datos.
+     * @param categoria El objeto categoriaModel con los datos actualizados y el ID de la categoría a modificar.
+     * @return true si la actualización fue exitosa, false en caso contrario.
+     */
     public static boolean actualizarCategoria(categoriaModel categoria) {
         String sql = "UPDATE categoria SET nombre_categoria = ? WHERE id_categoria = ?";
         try (Connection con = conexionDB.obtenerConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -44,6 +55,11 @@ public class categoriasController {
         }
     }
 
+    /**
+     * Elimina una categoría de la base de datos por su ID.
+     * @param idCategoria El ID de la categoría a eliminar.
+     * @return true si la eliminación fue exitosa, false en caso contrario.
+     */
     public static boolean eliminarCategoria(int idCategoria) {
         String sql = "DELETE FROM categoria WHERE id_categoria = ?";
         try (Connection con = conexionDB.obtenerConexion(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -56,6 +72,10 @@ public class categoriasController {
         }
     }
 
+    /**
+     * Obtiene una lista con todas las categorías de la base de datos.
+     * @return Una lista de objetos categoriaModel. La lista estará vacía si no hay categorías o si ocurre un error.
+     */
     public static List<categoriaModel> obtenerTodas() {
     List<categoriaModel> lista = new ArrayList<>();
     String sql = "SELECT id_categoria, nombre_categoria FROM categoria";

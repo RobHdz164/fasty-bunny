@@ -288,6 +288,8 @@ public class FrmUsuarios extends javax.swing.JInternalFrame {
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
         modificarUsuario();
+        cargarUsuario();
+
     }//GEN-LAST:event_btnModificarActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
@@ -429,24 +431,28 @@ private void eliminarUsuario() {
 }
 
 private void modificarUsuario() {
+    int fila = tblUsuario.getSelectedRow();
+    if (fila == -1) {
+        JOptionPane.showMessageDialog(this, "Seleccione un usuario a modificar.");
+        return;
+    }
+    int idUsuario = Integer.parseInt(tblUsuario.getValueAt(fila, 0).toString());
+    
     String nombre = txtNombre.getText().trim();
     String correo = txtCorreo.getText().trim();
     String contraseña = String.valueOf(txtContraseña.getPassword());
     String telefono = txtTelefono.getText().trim();
-    int idRol = idRolObtenido;
+    int idRol = cboRol.getSelectedIndex(); // si tienes un comboBox de roles
+    
+    usuarioModel usuario = new usuarioModel(nombre, correo, contraseña, telefono, idRol);
+    usuario.setIdUsuario(idUsuario);
 
-    if (!nombre.isEmpty() && !correo.isEmpty() && !contraseña.isEmpty() && !telefono.isEmpty()) {
-        usuarioModel u = new usuarioModel(nombre, correo, contraseña, telefono, idRol);
-        u.setIdUsuario(idUsuario);
-        if (usuarioController.actualizarUsuario(u)) {
-            cargarUsuario();
-            limpiarCampos();
-            JOptionPane.showMessageDialog(this, "Usuario modificado correctamente.");
-        } else {
-            JOptionPane.showMessageDialog(this, "Error al modificar el usuario.");
-        }
+    if (usuarioController.modificarUsuario(usuario)) {
+        JOptionPane.showMessageDialog(this, "Usuario modificado correctamente.");
+        cargarUsuario();  // método que refresca la tabla
+        limpiarCampos();
     } else {
-        JOptionPane.showMessageDialog(this, "Llenar todos los campos");
+        JOptionPane.showMessageDialog(this, "Error al modificar el usuario.");
     }
 }
 

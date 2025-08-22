@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package mx.edu.utxicotepec.fastybunny.view;
-
+import mx.edu.utxicotepec.fastybunny.controller.usuarioController;
 import javax.swing.JOptionPane;
 
 /**
@@ -44,7 +44,7 @@ public class FrmLogin extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(204, 255, 204));
 
         lblUsuario.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
-        lblUsuario.setText("Usuario");
+        lblUsuario.setText("Correo");
 
         lblContraseña.setFont(new java.awt.Font("Microsoft YaHei UI", 1, 14)); // NOI18N
         lblContraseña.setText("Contraseña");
@@ -165,15 +165,19 @@ public class FrmLogin extends javax.swing.JFrame {
             }
         });
     }
-    private void ValidarCredenciales(){
-        String usuario= txtUsuario.getText();
-        String contraseña =String.valueOf(txtContraseña.getPassword());
-        
-        if (usuario.equals("admin") && contraseña.equals("4321")) {
-            FrmMenu formmenu = new FrmMenu();
+    private void ValidarCredenciales() {
+        String usuario = txtUsuario.getText();
+        String password = String.valueOf(txtContraseña.getPassword());
+        usuarioController credenciales = new usuarioController();
+        boolean acceso = credenciales.verificarCredenciales(usuario, password);
+        if (acceso) {
+            FrmMenu formmenu = new FrmMenu ();
             formmenu.setVisible(true);
-        }else{
-            JOptionPane.showMessageDialog(this, "Error", "Usuario o contraseña incorrectos", 0);
+            FrmLogin.this.setVisible(false);
+            txtUsuario.setText("");
+            txtContraseña.setText("");
+        } else{
+            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrecta", "Error",0);
             txtUsuario.setText("");
             txtContraseña.setText("");
         }
